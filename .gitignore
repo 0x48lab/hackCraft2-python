@@ -1,0 +1,4 @@
+build/**
+dist/**
+py2hackCraft/__pycache__/**
+py2hackCraft2.egg-info/**
