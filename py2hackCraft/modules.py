@@ -119,6 +119,7 @@ class _WebSocketClient:
         logging.debug("send sending'%s'" % message)
         self.wait_for_connection()
         with self.lock:
+            self.result = None
             self.response_event.clear()  # イベントをクリアして新しいレスポンスの準備をする
             self.ws.send(message)
             self.response_event.wait()  # サーバーからのレスポンスを待つ
@@ -144,6 +145,19 @@ class Location:
     y: int
     z: int
     world: str = "world"
+
+@dataclass
+class InteractEvent:
+    action: str
+    type: str
+    name: str
+    block: str = None
+    data: int = 0
+    uuid: str = None
+    world: str = "world"
+    x: int = 0 
+    y: int = 0 
+    z: int = 0
 
 @dataclass
 class EventMessage:
@@ -210,6 +224,7 @@ class Block:
         z (int): ブロックのZ座標。
     """
     name: str
+    type: str = "block"
     data: int = 0
     isLiquid: bool = False
     isAir: bool = False
@@ -218,10 +233,10 @@ class Block:
     isOccluding: bool = False
     isSolid: bool = False
     isPassable: bool = False
-    world: str = "world"
     x: int = 0
     y: int = 0
     z: int = 0
+    world: str = "world"
 
 @dataclass
 class ItemStack:
@@ -284,11 +299,11 @@ class Player:
             "data": {"entity": name}
         }
         self.client.send(json.dumps(message))
-        uuid = self.client.result
-        if(uuid is None):
+        result = self.client.result
+        if(result is None):
             raise ValueError("Entity '%s' not found" % name)
 
-        return Entity(self.client, self.world, uuid)
+        return Entity(self.client, self.world, result)
 
 class World:
     """
@@ -299,7 +314,7 @@ class World:
         self.name = world
         self.entityUUID = entityUUID
 
-    def setBlock(self, x: int, y: int, z: int, block: str):
+    def setBlock(self, x: int, y: int, z: int, block: str, data: int = 0):
         """
         指定された座標にブロックを設置する。
 
@@ -309,7 +324,7 @@ class World:
             z (int): 絶対的なZ座標。
             block (str): 設置するブロックの種類。
         """
-        self.client.sendCall(self.entityUUID, "setBlock", [x, y, z, block])
+        self.client.sendCall(self.entityUUID, "setBlock", [x, y, z, block, data])
 
     def getBlock(self, x: int, y: int, z: int) -> Block :
         """
@@ -430,6 +445,18 @@ class Entity:
                 callbackFunc(self, power)
         self.client.setCallback('onEntityRedstone', callbackWrapper)
 
+    def setOnInteractEvent(self, callbackFunc: Callable[['Entity', 'InteractEvent'], Any]):
+        """
+        レッドストーンを受信したときに呼び出されるコールバック関数を設定する。
+        """
+        def callbackWrapper(data):
+            logging.debug("onInteractEvent callbackWrapper '%s'" % data)
+            if(data['entityUuid'] == self.uuid):
+                logging.debug("callbackWrapper '%s'" % data)
+                event = InteractEvent(**data["event"])
+                callbackFunc(self, event)
+        self.client.setCallback('onInteractEvent', callbackWrapper)    
+
     def setOnMessage(self, callbackFunc: Callable[['Entity', str], Any]):
         """
         メッセージを受信したときに呼び出されるコールバック関数を設定する。
@@ -451,6 +478,15 @@ class Entity:
             message (str): 送信するメッセージの内容。
         """
         self.client.sendCall(self.uuid, "sendEvent", [target, message])
+
+    def executeCommand(self, command: str):
+        """
+        コマンドを実行する。
+
+        Args:
+            command (str): 実行するコマンドの内容。
+        """
+        self.client.sendCall(self.uuid, "executeCommand", [command])
 
     def getWorld(self) -> 'World': 
         """
