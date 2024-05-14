@@ -47,7 +47,7 @@ def onInteractEvent(entity, event):
             return
         
         if( event.action == "right_click"):
-            if(event.block == "red_sand"):
+            if(event.name == "red_sand"):
                 entity.getWorld().setBlock(event.x, event.y, event.z, "sand")
             else:    
                 entity.getWorld().setBlock(event.x, event.y, event.z, "red_sand")

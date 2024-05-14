@@ -13,12 +13,11 @@ def selectionSort(entity: Entity):
         # 最小要素を未ソート部分の最初の要素と交換
         entity.swapItem(i, min_index)
 
-if __name__ == "__main__":
-    player = Player("masafumi_t")
-    player.login("localhost", 25570)
+player = Player("masafumi_t")
+player.login("localhost", 25570)
 
-    test = player.getEntity("test")
+hello = player.getEntity("hello")
 
-    selectionSort(test)
+selectionSort(hello)
 
-    player.logout()
+player.logout()

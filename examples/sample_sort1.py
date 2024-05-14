@@ -12,13 +12,12 @@ def bubbleSort(chest: Inventory):
             if item1.amount < item2.amount:
                 chest.swapItem(j+1, j)
 
-if __name__ == "__main__":
-    player = Player("masafumi_t")
-    player.login("localhost", 25570)
+player = Player("masafumi_t")
+player.login("localhost", 25570)
 
-    test = player.getEntity("test")
+hello = player.getEntity("hello")
 
-    chest = test.openInventory(0,0,1)
-    bubbleSort(chest)
+chest = hello.openInventory(0,0,1)
+bubbleSort(chest)
 
-    player.logout()
+player.logout()

@@ -4,14 +4,14 @@ from py2hackCraft.modules import Player
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-test = player.getEntity("test")
+hello = player.getEntity("hello")
 
-if(test.isBlocked()):
-    test.dig()
-    test.forward()
+if(hello.isBlocked()):
+    hello.dig()
+    hello.forward()
     while True:
-        if(not test.digUp()):
+        if(not hello.digUp()):
             break
-    test.back()
+    hello.back()
 
 player.logout()

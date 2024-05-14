@@ -6,25 +6,19 @@ genai.configure(api_key='<API KEY>')
 
 model = genai.GenerativeModel('gemini-pro')
 
-def onPlayerChat(entity, data):
-    response = model.generate_content(f"これ「${data.message}」を牛の言葉で返事してください。")
-    entity.say(response.text)
+player = Player("masafumi_t")
+player.login("localhost", 25570)
 
+hello = player.getEntity("hello")
+try:
+    while True:
+        hello.say("なにか手伝えることはありますか？")
+        chat = hello.waitForPlayerChat()
+        response = model.generate_content(f"これ「${chat.message}」を牛の言葉で返事してください。")
+        hello.say(response.text)
+        time.sleep(1)
 
-if __name__ == "__main__":
-    player = Player("masafumi_t")
-    player.login("localhost", 25570)
+except KeyboardInterrupt:
+    print("Disconnecting...")
 
-    test = player.getEntity("test")
-
-    test.setOnPlayerChat(onPlayerChat)
-    try:
-        test.say("なにか手伝えることはありますか？")
-
-        while True:
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        print("Disconnecting...")
-
-    player.logout()
+player.logout()

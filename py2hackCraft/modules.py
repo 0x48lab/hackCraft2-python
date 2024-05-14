@@ -90,6 +90,10 @@ class _WebSocketClient:
                         callback_thread = threading.Thread(target=callback, args=(jsonEvent['data'],))
                         callback_thread.start()
                         # callback(jsonEvent['data'])
+                        return
+                if(jsonEvent['data']):    
+                    self.result = jsonEvent['data']
+                    self.response_event.set()  # イベントをセットして、メッセージの受信を通知
                 return
             else:
                 self.result = data
@@ -129,6 +133,16 @@ class _WebSocketClient:
         self.ws.close()
         self.thread.join()
 
+    def waitFor(self, entity: str, name: str, args=None):
+        data = {"entity": entity, "name": name}
+        if args is not None:
+            data['args'] = args            
+        message = {
+            "type": "hook",
+            "data": data
+        }
+        self.send(json.dumps(message))
+
     def sendCall(self, entity: str, name: str, args=None):
         data = {"entity": entity, "name": name}
         if args is not None:
@@ -138,6 +152,11 @@ class _WebSocketClient:
             "data": data
         }
         self.send(json.dumps(message))
+
+class Coordinates:
+    world = ""
+    relative = "~"
+    local = "^"
 
 @dataclass
 class Location:
@@ -149,11 +168,12 @@ class Location:
 @dataclass
 class InteractEvent:
     action: str
-    type: str
+    player: str
+    player_uuid: str
+    event: str
     name: str
-    block: str = None
+    type: str
     data: int = 0
-    uuid: str = None
     world: str = "world"
     x: int = 0 
     y: int = 0 
@@ -266,17 +286,6 @@ class Player:
     def logout(self):
         self.client.disconnect()    
 
-    def setOnBlockBreak(self, callbackFunc: Callable[['Block'], Any]):
-        """
-        プレイヤーがブロックをこわした時に呼び出されるコールバック関数を設定する。
-        """
-        def callbackWrapper(data):
-            logging.debug("onPlayerBlockBreak callbackWrapper '%s'" % data)
-            if(data['playerUuid'] == self.uuid):
-                logging.debug("callbackWrapper '%s'" % data)
-                block = Block(**data['block'])
-                callbackFunc(self, block)
-        self.client.setCallback('onPlayerBlockBreak', callbackWrapper)
 
     def getEntity(self, name: str) -> 'Entity': 
         """
@@ -304,51 +313,6 @@ class Player:
             raise ValueError("Entity '%s' not found" % name)
 
         return Entity(self.client, self.world, result)
-
-class World:
-    """
-    ワールドを表すクラス。
-    """
-    def __init__(self, client: _WebSocketClient, world: str, entityUUID: str):
-        self.client = client
-        self.name = world
-        self.entityUUID = entityUUID
-
-    def setBlock(self, x: int, y: int, z: int, block: str, data: int = 0):
-        """
-        指定された座標にブロックを設置する。
-
-        Args:
-            x (int): 絶対的なX座標。
-            y (int): 絶対的なY座標。
-            z (int): 絶対的なZ座標。
-            block (str): 設置するブロックの種類。
-        """
-        self.client.sendCall(self.entityUUID, "setBlock", [x, y, z, block, data])
-
-    def getBlock(self, x: int, y: int, z: int) -> Block :
-        """
-        指定された座標のブロックを取得する。
-
-        Args:
-            x (int): 絶対的なX座標。
-            y (int): 絶対的なY座標。
-            z (int): 絶対的なZ座標。
-        """
-        self.client.sendCall(self.entityUUID, "getBlock", [x, y, z])
-        block = Block(** json.loads(self.client.result))
-        return block
-
-    def getBlockByColor(self, color: str) -> Block :
-        """
-        指定された色に近いブロックを取得する。
-
-        Args:
-            color (str): ブロックの色(HexRGB形式)
-        """
-        self.client.sendCall(self.entityUUID, "blockColor", [color])
-        block = Block(** json.loads(self.client.result))
-        return block
 
 class Inventory:
     """
@@ -422,32 +386,31 @@ class Entity:
         self.uuid = uuid
         self.positions = []
 
-    def setOnPlayerChat(self, callbackFunc: Callable[['Entity', 'ChatMessage'], Any]):
+    def waitForPlayerChat(self):
         """
-        チャットを受信したときに呼び出されるコールバック関数を設定する。
+        チャットを受信するまでまつ
         """
-        def callbackWrapper(data):
-            if(data['entityUuid'] == self.uuid):
-                logging.debug("callbackWrapper '%s'" % data)            
-                chatMessage = ChatMessage(**data)            
-                callbackFunc(self, chatMessage)
-        self.client.setCallback('onPlayerChat', callbackWrapper)
+        self.client.waitFor(self.uuid, 'onPlayerChat')
+        print('result = ', self.client.result)
+        return ChatMessage(** self.client.result)
 
-    def setOnRedstoneChange(self, callbackFunc: Callable[['Entity', 'RedstonePower'], Any]):
+    def waitForRedstoneChange(self):
         """
-        レッドストーンを受信したときに呼び出されるコールバック関数を設定する。
+        レッドストーン信号が変わるまでまつ。
         """
-        def callbackWrapper(data):
-            logging.debug("setOnRedstoneChange callbackWrapper '%s'" % data)
-            if(data['entityUuid'] == self.uuid):
-                logging.debug("callbackWrapper '%s'" % data)
-                power = RedstonePower(**data)
-                callbackFunc(self, power)
-        self.client.setCallback('onEntityRedstone', callbackWrapper)
+        self.client.waitFor(self.uuid, 'onEntityRedstone')
+        return RedstonePower(** self.client.result)
+
+    def waitForBreakBlock(self):
+        """
+        プレイヤーがブロックをこわすまで待つ。
+        """
+        self.client.waitFor(self.uuid, 'onPlayerBlockBreak')
+        return Block(** self.client.result)
 
     def setOnInteractEvent(self, callbackFunc: Callable[['Entity', 'InteractEvent'], Any]):
         """
-        レッドストーンを受信したときに呼び出されるコールバック関数を設定する。
+        プレイヤーがイベントアイテムを使った時に呼び出されるコールバック関数を設定する。
         """
         def callbackWrapper(data):
             logging.debug("onInteractEvent callbackWrapper '%s'" % data)
@@ -459,7 +422,7 @@ class Entity:
 
     def setOnMessage(self, callbackFunc: Callable[['Entity', str], Any]):
         """
-        メッセージを受信したときに呼び出されるコールバック関数を設定する。
+        カスタムイベントメッセージを受信したときに呼び出されるコールバック関数を設定する。
         """
         def callbackWrapper(data):
             logging.debug("setOnMessage callbackWrapper '%s'" % data)
@@ -471,7 +434,7 @@ class Entity:
 
     def sendMessage(self, target: str, message: str):
         """
-        メッセージを送信する。
+        カスタムイベントメッセージを送信する。
 
         Args:
             target (str): 送信先のEntityの名前。
@@ -487,24 +450,6 @@ class Entity:
             command (str): 実行するコマンドの内容。
         """
         self.client.sendCall(self.uuid, "executeCommand", [command])
-
-    def getWorld(self) -> 'World': 
-        """
-        指定された名前のワールドを取得する。
-
-        Args:
-            name (str): ワールドの名前。
-
-        Returns:
-            World: 取得したワールド。
-
-        Raises:
-            UninitializedClientError: クライアントが初期化されていない場合。        
-        """
-        if self.client is None or not self.client.connected:  # 接続状態をチェック
-            raise UninitializedClientError("Client is not initialized")
-
-        return World(self.client, self.world, self.uuid)
     
     def openInventory(self, x, y, z) -> Inventory :
         self.client.sendCall(self.uuid, "openInventory", [x, y, z])
@@ -591,14 +536,16 @@ class Entity:
         self.client.sendCall(self.uuid, "sound")
         return str_to_bool(self.client.result)
 
-    def move(self, speed: float) -> bool :
+    def addForce(self, x: float, y: float, z: float) -> bool :
         """
         前方へ移動する。
 
         Args:
-            speed (float): 移動速度。
+            x (float): x軸方向の加速
+            y (float): y軸方向の加速
+            z (float): z軸方向の加速
         """
-        self.client.sendCall(self.uuid, "move", [speed])
+        self.client.sendCall(self.uuid, "addForce", [x, y, z])
         return str_to_bool(self.client.result)
 
     def turn(self, degrees: int):
@@ -609,13 +556,6 @@ class Entity:
             degrees (int): 回転する速度。
         """
         self.client.sendCall(self.uuid, "turn", [degrees])  
-
-    def jump(self) -> bool :
-        """
-        自分をジャンプさせる。
-        """
-        self.client.sendCall(self.uuid, "jump")
-        return str_to_bool(self.client.result)
 
     def placeHere(self, x, y, z) -> bool :
         """
@@ -680,6 +620,13 @@ class Entity:
         self.client.sendCall(self.uuid, "digX", [0, 0, 0])
         return str_to_bool(self.client.result)
 
+    def attack(self) -> bool :
+        """
+        自分の前方を攻撃する。
+        """
+        self.client.sendCall(self.uuid, "attack")
+        return str_to_bool(self.client.result)
+
     def dig(self) -> bool :
         """
         自分の前方のブロックを壊す。
@@ -706,6 +653,27 @@ class Entity:
         自分を中心に指定した座標のブロックを壊す。
         """
         self.client.sendCall(self.uuid, "digX", [x, y, z])
+        return str_to_bool(self.client.result)
+
+    def action(self) -> bool :
+        """
+        自分の前方の装置を使う。
+        """
+        self.client.sendCall(self.uuid, "actionFront")
+        return str_to_bool(self.client.result)
+
+    def actionUp(self) -> bool :
+        """
+        自分の真上の装置を使う。
+        """
+        self.client.sendCall(self.uuid, "actionUp")
+        return str_to_bool(self.client.result)
+
+    def actionDown(self) -> bool :
+        """
+        自分の真下の装置を使う。
+        """
+        self.client.sendCall(self.uuid, "actionDown")
         return str_to_bool(self.client.result)
 
     def setItem(self, slot: int, block: str) -> bool :
@@ -828,15 +796,13 @@ class Entity:
         location = Location(** json.loads(self.client.result))
         return location
     
-    def teleport(self, x: int, y: int, z: int) :
+    def teleport(self, location: Location) :
         """
         自分を指定されたワールド座標に移動する。
         Args:
-            x (int): X座標。
-            y (int): Y座標。
-            z (int): Z座標。
+            location (Location): 座標。
         """
-        self.client.sendCall(self.uuid, "teleport", [x, y, z])
+        self.client.sendCall(self.uuid, "teleport", [location.x, location.y, location.z, Coordinates.world])
 
     def isBlocked(self) -> bool :
         """
@@ -903,3 +869,39 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "getTargetDistance", [uuid])
         return self.client.result
+
+    def setBlock(self, cord: Coordinates, x: int, y: int, z: int, block: str, data: int = 0):
+        """
+        指定された座標にブロックを設置する。
+
+        Args:
+            x (int): 絶対的なX座標。
+            y (int): 絶対的なY座標。
+            z (int): 絶対的なZ座標。
+            block (str): 設置するブロックの種類。
+        """
+        self.client.sendCall(self.uuid, "setBlock", [x, y, z, cord, block, data])
+
+    def getBlock(self, x: int, y: int, z: int) -> Block :
+        """
+        指定された座標のブロックを取得する。
+
+        Args:
+            x (int): 絶対的なX座標。
+            y (int): 絶対的なY座標。
+            z (int): 絶対的なZ座標。
+        """
+        self.client.sendCall(self.uuid, "getBlock", [x, y, z])
+        block = Block(** json.loads(self.client.result))
+        return block
+
+    def getBlockByColor(self, color: str) -> Block :
+        """
+        指定された色に近いブロックを取得する。
+
+        Args:
+            color (str): ブロックの色(HexRGB形式)
+        """
+        self.client.sendCall(self.uuid, "blockColor", [color])
+        block = Block(** json.loads(self.client.result))
+        return block

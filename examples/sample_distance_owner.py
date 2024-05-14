@@ -5,11 +5,11 @@ import time
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-test = player.getEntity("test")
+hello = player.getEntity("hello")
 
 try:
     while True:
-        d = test.getDistanceTarget(player.uuid)
+        d = hello.getDistanceTarget(player.uuid)
         print(d)
         time.sleep(1)
 

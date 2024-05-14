@@ -4,8 +4,8 @@ from py2hackCraft.modules import Player
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-test = player.getEntity("test")
+hello = player.getEntity("hello")
 
 while True:
-    test.lookAtTarget(player.uuid)
-    test.move(1.0)
+    hello.lookAtTarget(player.uuid)
+    hello.addForce(0, 0, 0.3)

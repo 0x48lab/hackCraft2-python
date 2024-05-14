@@ -5,21 +5,14 @@ def onMessage(entity, event):
     print("Message from %s: %s" % (event.sender, event.message))
     entity.say("I got your message!")
 
-if __name__ == "__main__":
-    player = Player("masafumi_t")
-    player.login("localhost", 25570)
+player = Player("masafumi_t")
+player.login("localhost", 25570)
 
-    test = player.getEntity("test")
+hello = player.getEntity("hello")
 
-    test.setOnMessage(onMessage)
+hello.setOnMessage(onMessage)
 
-    test.sendMessage("dog", "hello")   
+hello.sendMessage("hello", "hello")   
 
-    try:
-        while True:
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        print("Disconnecting...")
-
-    player.logout()
+quit = input("Press Enter to quit...")
+player.logout()

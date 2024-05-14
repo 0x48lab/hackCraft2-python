@@ -4,9 +4,9 @@ from py2hackCraft.modules import Player
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-test = player.getEntity("test")
+hello = player.getEntity("hello")
 
-ret = test.inspectDown()
-test.say(f"これは{ret.name}です。")
+ret = hello.inspectDown()
+hello.say(f"これは{ret.name}です。")
 
 player.logout()

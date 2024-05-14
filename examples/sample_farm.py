@@ -19,20 +19,19 @@ def farming(entity: Entity):
         plant(entity)
 
 
-if __name__ == "__main__":
-    player = Player("masafumi_t")
-    player.login("localhost", 25570)
+player = Player("masafumi_t")
+player.login("localhost", 25570)
 
-    test = player.getEntity("test")
-    test.setItem(0, Items.DIAMOND_HOE)
-    test.setItem(1, Blocks.WHEAT_SEEDS)
+hello = player.getEntity("hello")
+hello.setItem(0, Items.DIAMOND_HOE)
+hello.setItem(1, Blocks.WHEAT_SEEDS)
 
-    mark = test.getLocation()
-    for x in range(5):
-        test.forward()
-        farming(test)
-    test.teleport(mark.x, mark.y, mark.z)    
+home = hello.getLocation()
+for x in range(5):
+    hello.forward()
+    farming(hello)
+hello.teleport(home)    
 
-    player.logout()
+player.logout()
 
 

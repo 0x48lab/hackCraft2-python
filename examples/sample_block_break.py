@@ -1,22 +1,18 @@
 from py2hackCraft.modules import Player
 import time
 
-def onBlockBreak(player, block):
-    print("example::onBlockBreak %s %d %d %d" %(block.name, block.x, block.y, block.z))
+player = Player("masafumi_t")
+player.login("localhost", 25570)
 
-if __name__ == "__main__":
-    player = Player("masafumi_t")
-    player.login("localhost", 25570)
+hello = player.getEntity("hello")
 
-    test = player.getEntity("test")
+try:
+    while True:
+        block = hello.waitForBreakBlock()    
+        print("example::onBlockBreak %s %d %d %d" %(block.name, block.x, block.y, block.z))
+        time.sleep(1)
 
-    player.setOnBlockBreak(onBlockBreak)    
+except KeyboardInterrupt:
+    print("Disconnecting...")
 
-    try:
-        while True:
-            time.sleep(1)
-
-    except KeyboardInterrupt:
-        print("Disconnecting...")
-
-    player.logout()
+player.logout()
