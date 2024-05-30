@@ -311,8 +311,15 @@ class Player:
         result = self.client.result
         if(result is None):
             raise ValueError("Entity '%s' not found" % name)
+        
 
-        return Entity(self.client, self.world, result)
+        entity =  Entity(self.client, self.world, result)
+        #ロールバックできるように設定
+        self.client.send(json.dumps({
+            "type": "start",
+            "data": {"entity": entity.uuid}
+        }))
+        return entity
 
 class Inventory:
     """
@@ -385,6 +392,9 @@ class Entity:
         self.world = world
         self.uuid = uuid
         self.positions = []
+
+    def reset(self):
+        self.client.sendCall(self.uuid, "restoreArea")
 
     def waitForPlayerChat(self):
         """

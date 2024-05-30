@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from py2hackCraft.modules import Player, Entity
+from py2hackCraft.modules import Player, Entity, Coordinates
 import time
 import random
 
@@ -25,7 +25,6 @@ def isTntLocation(x, y, z):
 
 def createStage(entity: Entity):
     global stage
-    world = entity.getWorld()
     location = entity.getLocation()
     stage = Area(location.x, location.y, location.z, location.x + 10, location.y, location.z + 10)
     #　蓋
@@ -34,10 +33,10 @@ def createStage(entity: Entity):
             sx = location.x + x
             sy = location.y
             sz = location.z + y + 1
-            world.setBlock(sx, sy, sz, "sand")
+            entity.setBlock(Coordinates.world, sx, sy, sz, "sand")
             # 1ブロック下にランダムで"TNT"または"stone"を配置
             block_choice = random.choice(["TNT", "stone"])  # ランダムにブロックを選択
-            world.setBlock(sx, sy - 1, sz, block_choice)  # 選択したブロックを1ブロック下に配置
+            entity.setBlock(Coordinates.world, sx, sy - 1, sz, block_choice)  # 選択したブロックを1ブロック下に配置
             if block_choice == "TNT":
                 tnt_locations.append((sx, sy, sz))
 
@@ -48,17 +47,17 @@ def onInteractEvent(entity, event):
         
         if( event.action == "right_click"):
             if(event.name == "red_sand"):
-                entity.getWorld().setBlock(event.x, event.y, event.z, "sand")
+                entity.setBlock(Coordinates.world, event.x, event.y, event.z, "sand")
             else:    
-                entity.getWorld().setBlock(event.x, event.y, event.z, "red_sand")
+                entity.setBlock(Coordinates.world,event.x, event.y, event.z, "red_sand")
         else:
             if(isTntLocation(event.x, event.y, event.z)):
-                entity.getWorld().setBlock(event.x, event.y, event.z, "air")
+                entity.setBlock(Coordinates.world,event.x, event.y, event.z, "air")
                 entity.executeCommand("title masafumi_t title {\"text\":\"ちゅっどーーーん！\",\"color\":\"red\"}")
                 entity.executeCommand(f"summon creeper {event.x} {event.x} {event.x} {{Fuse:0,ExplosionRadius:3}}")
                 #entity.getWorld().createExplosion(block.x, block.y, block.z, 4.0)
             else:    
-                entity.getWorld().setBlock(event.x, event.y, event.z, "air")
+                entity.setBlock(Coordinates.world,event.x, event.y, event.z, "air")
 
 player = Player("masafumi_t")
 player.login("localhost", 25570)
