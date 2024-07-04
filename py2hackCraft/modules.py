@@ -558,6 +558,12 @@ class Entity:
         self.client.sendCall(self.uuid, "addForce", [x, y, z])
         return str_to_bool(self.client.result)
 
+    def jump(self, degrees: int):
+        """
+        ジャンプさせる。
+        """
+        self.client.sendCall(self.uuid, "jump")  
+
     def turn(self, degrees: int):
         """
         自分を回転させる。
@@ -567,11 +573,17 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "turn", [degrees])  
 
-    def placeHere(self, x, y, z) -> bool :
+    def placeX(self, x, y, z, cord) -> bool :
         """
-        自分を中心に指定した座標にブロックを設置する。
+        指定した座標にブロックを設置する。
+
+        Args:
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+            cord (str): 座標の種類（'', '^', '~'）。
         """
-        self.client.sendCall(self.uuid, "placeX", [x, y, z])
+        self.client.sendCall(self.uuid, "placeX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
     def place(self) -> bool :
@@ -616,11 +628,17 @@ class Entity:
         self.client.sendCall(self.uuid, "useItemDown")
         return str_to_bool(self.client.result)
 
-    def useItemHere(self, x, y, z) -> bool :
+    def useItemX(self, x, y, z, cord) -> bool :
         """
-        自分を中心に指定した座標にアイテムを使う
+        指定した座標にアイテムを使う
+
+        Args:
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+            cord (str): 座標の種類（'', '^', '~'）。        
         """
-        self.client.sendCall(self.uuid, "useItemX", [x, y, z])
+        self.client.sendCall(self.uuid, "useItemX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
     def harvest(self) -> bool :
@@ -658,11 +676,17 @@ class Entity:
         self.client.sendCall(self.uuid, "digDown")
         return str_to_bool(self.client.result)
 
-    def digHere(self, x, y, z) -> bool :
+    def digX(self, x, y, z, cord) -> bool :
         """
-        自分を中心に指定した座標のブロックを壊す。
+        指定した座標のブロックを壊す。
+
+        Args:
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+            cord (str): 座標の種類（'', '^', '~'）。        
         """
-        self.client.sendCall(self.uuid, "digX", [x, y, z])
+        self.client.sendCall(self.uuid, "digX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
     def action(self) -> bool :
@@ -729,7 +753,7 @@ class Entity:
         self.client.sendCall(self.uuid, "dropItem", [slot1])
         return str_to_bool(self.client.result)
 
-    def holdItem(self, slot: int) -> bool :
+    def grabItem(self, slot: int) -> bool :
         """
         自分のインベントリのアイテムを手に持たせる。
 
@@ -748,18 +772,19 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "sendChat", [message])
 
-    def inspectHere(self, x: int, y: int, z: int) -> Block :
+    def inspectX(self, x: int, y: int, z: int, cord: str) -> Block :
         """
-        自分を中心に指定された座標のブロックを調べる。
+        指定された座標のブロックを調べる。
 
         Args:
             x (int): X座標。
             y (int): Y座標。
             z (int): Z座標。
+            cord (str): 座標の種類（'', '^', '~'）。
         Returns:
             Block: 調べたブロックの情報。    
         """
-        self.client.sendCall(self.uuid, "inspect", [x, y, z])
+        self.client.sendCall(self.uuid, "inspect", [x, y, z, cord])
         block = Block(** json.loads(self.client.result))
         return block
 
