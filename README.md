@@ -10,3 +10,7 @@ build:
 deploy:
     <command>
     twine upload --repository-url https://upload.pypi.org/legacy/ dist/* -u "__token__"
+
+doc:
+    <command>
+    make html

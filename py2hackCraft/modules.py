@@ -154,12 +154,24 @@ class _WebSocketClient:
         self.send(json.dumps(message))
 
 class Coordinates:
+    """
+    座標の基準を表すデータクラス
+    """
     world = ""
     relative = "~"
     local = "^"
 
 @dataclass
 class Location:
+    """
+    座標を表すデータクラス。
+
+    Attributes:
+        x (str): X座標。
+        y (str): Y座標。
+        z (str): Z座標。
+        world (str): ワールド名。
+    """
     x: int
     y: int
     z: int
@@ -167,6 +179,22 @@ class Location:
 
 @dataclass
 class InteractEvent:
+    """
+    クリックイベントを表すデータクラス。
+
+    Attributes:
+        action (str): アクションの名前。
+        player (str): クリックしたプレイヤー名。
+        player_uuid (str): クリックしたプレイヤーの一意の識別子（UUID）。
+        event (str): アイテムに設定されている名前。
+        name (str): ブロックあるいはエンティティーの名前
+        type (str): ブロックあるいはエンティティーの種類。
+        data (int): ブロックのデータ値。
+        world (str): ブロックあるいはエンティティーのいたワールド名。
+        x (int): クリックした場所のワールドにおけるX座標。
+        y (int): クリックした場所のワールドにおけるY座標。
+        z (int): クリックした場所のワールドにおけるZ座標。
+    """
     action: str
     player: str
     player_uuid: str
@@ -480,7 +508,7 @@ class Entity:
         """
         if(len(self.positions) > 0):
             pos = self.positions.pop()
-            self.teleport(pos.x, pos.y, pos.z)
+            self.teleport(pos)
             return True
         else:
             return False
@@ -573,38 +601,79 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "turn", [degrees])  
 
-    def placeX(self, x, y, z, cord) -> bool :
+    def placeX(self, cord: Coordinates, x: int, y: int, z: int, block=None, side=None) -> bool :
         """
         指定した座標にブロックを設置する。
+
+        Args:
+            cord (Coordinates): 座標の種類（'', '^', '~'）。
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+            block (str): 設置するブロックの種類。
+            side (str): 設置する面。
+        """
+        self.client.sendCall(self.uuid, "placeX", [x, y, z, cord, side, block])
+        return str_to_bool(self.client.result)
+
+    def placeHere(self, x: int, y: int, z: int, block=None, side=None) -> bool :
+        """
+        自分を中心に指定した座標にブロックを設置する。
 
         Args:
             x (int): X座標。
             y (int): Y座標。
             z (int): Z座標。
-            cord (str): 座標の種類（'', '^', '~'）。
+            block (str): 設置するブロックの種類。
+            side (str): 設置する面。
         """
-        self.client.sendCall(self.uuid, "placeX", [x, y, z, cord])
+        self.client.sendCall(self.uuid, "placeX", [x, y, z, "^", side, block])
         return str_to_bool(self.client.result)
 
-    def place(self) -> bool :
+    def place(self, side=None) -> bool :
         """
         自分の前方にブロックを設置する。
         """
         self.client.sendCall(self.uuid, "placeFront")
-        return str_to_bool(self.client.result)
+        return str_to_bool(self.client.result, [side])
 
-    def placeUp(self) -> bool :
+    def placeUp(self, side=None) -> bool :
         """
         自分の真上にブロックを設置する。
         """
         self.client.sendCall(self.uuid, "placeUp")
-        return str_to_bool(self.client.result)
+        return str_to_bool(self.client.result, [side])
 
-    def placeDown(self) -> bool :
+    def placeDown(self, side=None) -> bool :
         """
         自分の真下にブロックを設置する。
         """
         self.client.sendCall(self.uuid, "placeDown")
+        return str_to_bool(self.client.result, [side])
+
+    def useItemX(self, cord: Coordinates, x: int, y: int, z: int) -> bool :
+        """
+        指定した座標にアイテムを使う
+
+        Args:
+            cord (Coordinates): 座標の種類（'', '^', '~'）。        
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+        """
+        self.client.sendCall(self.uuid, "useItemX", [x, y, z, cord])
+        return str_to_bool(self.client.result)
+
+    def useItemHere(self, x: int, y: int, z: int) -> bool :
+        """
+        自分を中心に指定した座標にアイテムを使う
+
+        Args:
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+        """
+        self.client.sendCall(self.uuid, "useItemX", [x, y, z, "^"])
         return str_to_bool(self.client.result)
 
     def useItem(self) -> bool :
@@ -626,19 +695,6 @@ class Entity:
         自分の真下にアイテムを使う
         """
         self.client.sendCall(self.uuid, "useItemDown")
-        return str_to_bool(self.client.result)
-
-    def useItemX(self, x, y, z, cord) -> bool :
-        """
-        指定した座標にアイテムを使う
-
-        Args:
-            x (int): X座標。
-            y (int): Y座標。
-            z (int): Z座標。
-            cord (str): 座標の種類（'', '^', '~'）。        
-        """
-        self.client.sendCall(self.uuid, "useItemX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
     def harvest(self) -> bool :
@@ -676,15 +732,15 @@ class Entity:
         self.client.sendCall(self.uuid, "digDown")
         return str_to_bool(self.client.result)
 
-    def digX(self, x, y, z, cord) -> bool :
+    def digX(self, cord: Coordinates, x : int, y: int, z: int) -> bool :
         """
         指定した座標のブロックを壊す。
 
         Args:
+            cord (Coordinates): 座標の種類（'', '^', '~'）。        
             x (int): X座標。
             y (int): Y座標。
             z (int): Z座標。
-            cord (str): 座標の種類（'', '^', '~'）。        
         """
         self.client.sendCall(self.uuid, "digX", [x, y, z, cord])
         return str_to_bool(self.client.result)
@@ -772,19 +828,34 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "sendChat", [message])
 
-    def inspectX(self, x: int, y: int, z: int, cord: str) -> Block :
+    def inspectX(self, cord: Coordinates, x: int, y: int, z: int) -> Block :
         """
         指定された座標のブロックを調べる。
+
+        Args:
+            cord (Coordinates): 座標の種類（'', '^', '~'）。
+            x (int): X座標。
+            y (int): Y座標。
+            z (int): Z座標。
+        Returns:
+            Block: 調べたブロックの情報。    
+        """
+        self.client.sendCall(self.uuid, "inspect", [x, y, z, cord])
+        block = Block(** json.loads(self.client.result))
+        return block
+
+    def inspectHere(self, x: int, y: int, z: int) -> Block :
+        """
+        自分を中心に指定された座標のブロックを調べる。
 
         Args:
             x (int): X座標。
             y (int): Y座標。
             z (int): Z座標。
-            cord (str): 座標の種類（'', '^', '~'）。
         Returns:
             Block: 調べたブロックの情報。    
         """
-        self.client.sendCall(self.uuid, "inspect", [x, y, z, cord])
+        self.client.sendCall(self.uuid, "inspect", [x, y, z, "^"])
         block = Block(** json.loads(self.client.result))
         return block
 
@@ -866,6 +937,34 @@ class Entity:
         self.client.sendCall(self.uuid, "isBlockedDown")
         return str_to_bool(self.client.result)
 
+
+    def canDig(self) -> bool :
+        """
+        自分の前方のブロックが壊せるかどうか調べる。
+        Returns:
+            bool: 調べた結果。    
+        """
+        self.client.sendCall(self.uuid, "isCanDigFront")
+        return str_to_bool(self.client.result)
+
+    def canDigUp(self) -> bool :
+        """
+        自分の上のブロックが壊せるかどうか調べる。
+        Returns:
+            bool: 調べた結果。    
+        """
+        self.client.sendCall(self.uuid, "isCanDigUp")
+        return str_to_bool(self.client.result)
+
+    def canDigDown(self) -> bool :
+        """
+        自分の下のブロックが壊せるかどうか調べる。
+        Returns:
+            bool: 調べた結果。    
+        """
+        self.client.sendCall(self.uuid, "isCanDigDown")
+        return str_to_bool(self.client.result)
+
     def lookAtTarget(self, uuid) -> bool:
         """
         指定されたエンティティを見る。
@@ -889,7 +988,7 @@ class Entity:
         自分と真上のターゲットとの距離を調べる。
         """
         self.client.sendCall(self.uuid, "getTargetDistanceUp")
-        return self.client.result
+        return float(self.client.result)
 
     def getDistanceDown(self) -> float :
         """
@@ -907,9 +1006,10 @@ class Entity:
 
     def setBlock(self, cord: Coordinates, x: int, y: int, z: int, block: str, data: int = 0):
         """
-        指定された座標にブロックを設置する。
+        指定された座標にブロックを設置する。（クリエイティブ）
 
         Args:
+            cord (Coordinates): 座標の種類（'', '^', '~'）。
             x (int): 絶対的なX座標。
             y (int): 絶対的なY座標。
             z (int): 絶対的なZ座標。
