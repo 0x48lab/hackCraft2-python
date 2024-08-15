@@ -450,25 +450,6 @@ class Entity:
         self.client.waitFor(self.uuid, 'onEntityRedstone')
         return RedstonePower(** self.client.result)
 
-    def waitForBreakBlock(self):
-        """
-        プレイヤーがブロックをこわすまで待つ
-        """
-        self.client.waitFor(self.uuid, 'onPlayerBlockBreak')
-        return Block(** self.client.result)
-
-    def setOnInteractEvent(self, callbackFunc: Callable[['Entity', 'InteractEvent'], Any]):
-        """
-        プレイヤーがイベントアイテムを使った時に呼び出されるコールバック関数を設定する
-        """
-        def callbackWrapper(data):
-            logging.debug("onInteractEvent callbackWrapper '%s'" % data)
-            if(data['entityUuid'] == self.uuid):
-                logging.debug("callbackWrapper '%s'" % data)
-                event = InteractEvent(**data["event"])
-                callbackFunc(self, event)
-        self.client.setCallback('onInteractEvent', callbackWrapper)    
-
     def setOnMessage(self, callbackFunc: Callable[['Entity', str], Any]):
         """
         カスタムイベントメッセージを受信したときに呼び出されるコールバック関数を設定する
@@ -1034,34 +1015,23 @@ class Entity:
         self.client.sendCall(self.uuid, "isCanDigDown")
         return str_to_bool(self.client.result)
 
-    def lookAtTarget(self, uuid) -> bool:
-        """
-        指定されたエンティティを見る
-        Args:
-            uuid (str): エンティティのUUID
-        Returns:
-            bool: 調べた結果    
-        """
-        self.client.sendCall(self.uuid, "lookAtTarget", [uuid])
-        return str_to_bool(self.client.result)
-
     def getDistance(self) -> float :
         """
-        自分と前方のターゲットとの距離を調べる
+        自分と前方のなにかとの距離を調べる
         """
         self.client.sendCall(self.uuid, "getTargetDistanceFront")
         return self.client.result
 
     def getDistanceUp(self) -> float :
         """
-        自分と真上のターゲットとの距離を調べる
+        自分と真上のなにかとの距離を調べる
         """
         self.client.sendCall(self.uuid, "getTargetDistanceUp")
         return float(self.client.result)
 
     def getDistanceDown(self) -> float :
         """
-        自分と真下のターゲットとの距離を調べる
+        自分と真下のなにかとの距離を調べる
         """
         self.client.sendCall(self.uuid, "getTargetDistanceDown")
         return self.client.result
@@ -1072,31 +1042,6 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "getTargetDistance", [uuid])
         return self.client.result
-
-    def setBlock(self, x: int, y: int, z: int, block: str, data: int = 0):
-        """
-        指定された座標にブロックを設置する（クリエイティブ）
-
-        Args:
-            x (int): 絶対的なX座標
-            y (int): 絶対的なY座標
-            z (int): 絶対的なZ座標
-            block (str): 設置するブロックの種類
-        """
-        self.client.sendCall(self.uuid, "setBlock", [x, y, z, "", block, data])
-
-    def getBlock(self, x: int, y: int, z: int) -> Block :
-        """
-        指定された座標のブロックを取得する
-
-        Args:
-            x (int): 絶対的なX座標
-            y (int): 絶対的なY座標
-            z (int): 絶対的なZ座標
-        """
-        self.client.sendCall(self.uuid, "getBlock", [x, y, z])
-        block = Block(** json.loads(self.client.result))
-        return block
 
     def getBlockByColor(self, color: str) -> Block :
         """

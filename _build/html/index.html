@@ -89,7 +89,6 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.flatten"><code class="docutils literal notranslate"><span class="pre">Entity.flatten()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.flattenX"><code class="docutils literal notranslate"><span class="pre">Entity.flattenX()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.forward"><code class="docutils literal notranslate"><span class="pre">Entity.forward()</span></code></a></li>
-<li><a class="reference internal" href="#py2hackCraft.modules.Entity.getBlock"><code class="docutils literal notranslate"><span class="pre">Entity.getBlock()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.getBlockByColor"><code class="docutils literal notranslate"><span class="pre">Entity.getBlockByColor()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.getDistance"><code class="docutils literal notranslate"><span class="pre">Entity.getDistance()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.getDistanceDown"><code class="docutils literal notranslate"><span class="pre">Entity.getDistanceDown()</span></code></a></li>
@@ -107,7 +106,6 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.isBlockedDown"><code class="docutils literal notranslate"><span class="pre">Entity.isBlockedDown()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.isBlockedUp"><code class="docutils literal notranslate"><span class="pre">Entity.isBlockedUp()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.jump"><code class="docutils literal notranslate"><span class="pre">Entity.jump()</span></code></a></li>
-<li><a class="reference internal" href="#py2hackCraft.modules.Entity.lookAtTarget"><code class="docutils literal notranslate"><span class="pre">Entity.lookAtTarget()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.makeSound"><code class="docutils literal notranslate"><span class="pre">Entity.makeSound()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.moveItem"><code class="docutils literal notranslate"><span class="pre">Entity.moveItem()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.place"><code class="docutils literal notranslate"><span class="pre">Entity.place()</span></code></a></li>
@@ -122,9 +120,7 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.say"><code class="docutils literal notranslate"><span class="pre">Entity.say()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.selectItem"><code class="docutils literal notranslate"><span class="pre">Entity.selectItem()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.sendMessage"><code class="docutils literal notranslate"><span class="pre">Entity.sendMessage()</span></code></a></li>
-<li><a class="reference internal" href="#py2hackCraft.modules.Entity.setBlock"><code class="docutils literal notranslate"><span class="pre">Entity.setBlock()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.setItem"><code class="docutils literal notranslate"><span class="pre">Entity.setItem()</span></code></a></li>
-<li><a class="reference internal" href="#py2hackCraft.modules.Entity.setOnInteractEvent"><code class="docutils literal notranslate"><span class="pre">Entity.setOnInteractEvent()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.setOnMessage"><code class="docutils literal notranslate"><span class="pre">Entity.setOnMessage()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.stepLeft"><code class="docutils literal notranslate"><span class="pre">Entity.stepLeft()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.stepRight"><code class="docutils literal notranslate"><span class="pre">Entity.stepRight()</span></code></a></li>
@@ -141,7 +137,6 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.useItemHere"><code class="docutils literal notranslate"><span class="pre">Entity.useItemHere()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.useItemUp"><code class="docutils literal notranslate"><span class="pre">Entity.useItemUp()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.useItemX"><code class="docutils literal notranslate"><span class="pre">Entity.useItemX()</span></code></a></li>
-<li><a class="reference internal" href="#py2hackCraft.modules.Entity.waitForBreakBlock"><code class="docutils literal notranslate"><span class="pre">Entity.waitForBreakBlock()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.waitForPlayerChat"><code class="docutils literal notranslate"><span class="pre">Entity.waitForPlayerChat()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.waitForRedstoneChange"><code class="docutils literal notranslate"><span class="pre">Entity.waitForRedstoneChange()</span></code></a></li>
 </ul>
@@ -573,21 +568,6 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.getBlock">
-<span class="sig-name descname"><span class="pre">getBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#py2hackCraft.modules.Block" title="py2hackCraft.modules.Block"><span class="pre">Block</span></a></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.getBlock" title="Link to this definition"></a></dt>
-<dd><p>指定された座標のブロックを取得する</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>int</em>) -- 絶対的なX座標</p></li>
-<li><p><strong>y</strong> (<em>int</em>) -- 絶対的なY座標</p></li>
-<li><p><strong>z</strong> (<em>int</em>) -- 絶対的なZ座標</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.getBlockByColor">
 <span class="sig-name descname"><span class="pre">getBlockByColor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#py2hackCraft.modules.Block" title="py2hackCraft.modules.Block"><span class="pre">Block</span></a></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.getBlockByColor" title="Link to this definition"></a></dt>
 <dd><p>指定された色に近いブロックを取得する</p>
@@ -601,13 +581,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.getDistance">
 <span class="sig-name descname"><span class="pre">getDistance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.getDistance" title="Link to this definition"></a></dt>
-<dd><p>自分と前方のターゲットとの距離を調べる</p>
+<dd><p>自分と前方のなにかとの距離を調べる</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.getDistanceDown">
 <span class="sig-name descname"><span class="pre">getDistanceDown</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.getDistanceDown" title="Link to this definition"></a></dt>
-<dd><p>自分と真下のターゲットとの距離を調べる</p>
+<dd><p>自分と真下のなにかとの距離を調べる</p>
 </dd></dl>
 
 <dl class="py method">
@@ -619,7 +599,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.getDistanceUp">
 <span class="sig-name descname"><span class="pre">getDistanceUp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.getDistanceUp" title="Link to this definition"></a></dt>
-<dd><p>自分と真上のターゲットとの距離を調べる</p>
+<dd><p>自分と真上のなにかとの距離を調べる</p>
 </dd></dl>
 
 <dl class="py method">
@@ -763,22 +743,6 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.lookAtTarget">
-<span class="sig-name descname"><span class="pre">lookAtTarget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uuid</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.lookAtTarget" title="Link to this definition"></a></dt>
-<dd><p>指定されたエンティティを見る
-:param uuid: エンティティのUUID
-:type uuid: str</p>
-<dl class="field-list simple">
-<dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>調べた結果</p>
-</dd>
-<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.makeSound">
 <span class="sig-name descname"><span class="pre">makeSound</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.makeSound" title="Link to this definition"></a></dt>
 <dd><p>自分を鳴かせる</p>
@@ -912,22 +876,6 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.setBlock">
-<span class="sig-name descname"><span class="pre">setBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Entity.setBlock" title="Link to this definition"></a></dt>
-<dd><p>指定された座標にブロックを設置する（クリエイティブ）</p>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> (<em>int</em>) -- 絶対的なX座標</p></li>
-<li><p><strong>y</strong> (<em>int</em>) -- 絶対的なY座標</p></li>
-<li><p><strong>z</strong> (<em>int</em>) -- 絶対的なZ座標</p></li>
-<li><p><strong>block</strong> (<em>str</em>) -- 設置するブロックの種類</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.setItem">
 <span class="sig-name descname"><span class="pre">setItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.setItem" title="Link to this definition"></a></dt>
 <dd><p>自分のインベントリにアイテムを設定する</p>
@@ -939,12 +887,6 @@
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.setOnInteractEvent">
-<span class="sig-name descname"><span class="pre">setOnInteractEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callbackFunc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#py2hackCraft.modules.Entity" title="py2hackCraft.modules.Entity"><span class="pre">Entity</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#py2hackCraft.modules.InteractEvent" title="py2hackCraft.modules.InteractEvent"><span class="pre">InteractEvent</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Entity.setOnInteractEvent" title="Link to this definition"></a></dt>
-<dd><p>プレイヤーがイベントアイテムを使った時に呼び出されるコールバック関数を設定する</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1077,12 +1019,6 @@
 </ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.waitForBreakBlock">
-<span class="sig-name descname"><span class="pre">waitForBreakBlock</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Entity.waitForBreakBlock" title="Link to this definition"></a></dt>
-<dd><p>プレイヤーがブロックをこわすまで待つ</p>
 </dd></dl>
 
 <dl class="py method">
