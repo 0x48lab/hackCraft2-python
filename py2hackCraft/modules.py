@@ -578,7 +578,7 @@ class Entity:
         self.client.sendCall(self.uuid, "addForce", [x, y, z])
         return str_to_bool(self.client.result)
 
-    def jump(self, degrees: int):
+    def jump(self):
         """
         ジャンプさせる
         """
