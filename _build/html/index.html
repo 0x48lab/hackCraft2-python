@@ -86,6 +86,7 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.down"><code class="docutils literal notranslate"><span class="pre">Entity.down()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.dropItem"><code class="docutils literal notranslate"><span class="pre">Entity.dropItem()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.executeCommand"><code class="docutils literal notranslate"><span class="pre">Entity.executeCommand()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.findNearbyBlockX"><code class="docutils literal notranslate"><span class="pre">Entity.findNearbyBlockX()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.flatten"><code class="docutils literal notranslate"><span class="pre">Entity.flatten()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.flattenX"><code class="docutils literal notranslate"><span class="pre">Entity.flattenX()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.forward"><code class="docutils literal notranslate"><span class="pre">Entity.forward()</span></code></a></li>
@@ -540,6 +541,30 @@
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.findNearbyBlockX">
+<span class="sig-name descname"><span class="pre">findNearbyBlockX</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cord</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#py2hackCraft.modules.Coordinates" title="py2hackCraft.modules.Coordinates"><span class="pre">Coordinates</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">block</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxDepth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#py2hackCraft.modules.Block" title="py2hackCraft.modules.Block"><span class="pre">Block</span></a></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.findNearbyBlockX" title="Link to this definition"></a></dt>
+<dd><p>指定された座標を中心に近くのブロックを取得する</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) -- X座標</p></li>
+<li><p><strong>y</strong> (<em>int</em>) -- Y座標</p></li>
+<li><p><strong>z</strong> (<em>int</em>) -- Z座標</p></li>
+<li><p><strong>cord</strong> (<a class="reference internal" href="#py2hackCraft.modules.Coordinates" title="py2hackCraft.modules.Coordinates"><em>Coordinates</em></a>) -- 座標の種類（'', '^', '~'）</p></li>
+<li><p><strong>block</strong> (<em>str</em>) -- ブロックの名前( &quot;water:0&quot; など)</p></li>
+<li><p><strong>maxDepth</strong> (<em>int</em>) -- 探索する最大の深さ</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>調べたブロックの情報</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#py2hackCraft.modules.Block" title="py2hackCraft.modules.Block">Block</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.flatten">
 <span class="sig-name descname"><span class="pre">flatten</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.flatten" title="Link to this definition"></a></dt>
 <dd><p>自分の足元のブロックに平らにする</p>
@@ -630,7 +655,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.inspect">
 <span class="sig-name descname"><span class="pre">inspect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#py2hackCraft.modules.Block" title="py2hackCraft.modules.Block"><span class="pre">Block</span></a></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.inspect" title="Link to this definition"></a></dt>
-<dd><p>自分のいる場所のブロックを調べる</p>
+<dd><p>自分の前方のブロックを調べる</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
 <dd class="field-odd"><p>調べたブロックの情報</p>
@@ -1203,7 +1228,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Inventory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">py2hackCraft.modules.</span></span><span class="sig-name descname"><span class="pre">Inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_WebSocketClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entityUUID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Inventory" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">py2hackCraft.modules.</span></span><span class="sig-name descname"><span class="pre">Inventory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_WebSocketClient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entityUUID</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Inventory" title="Link to this definition"></a></dt>
 <dd><p>インベントリを表すクラス</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Inventory.getItem">
@@ -1232,13 +1257,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Inventory.retrieveItem">
-<span class="sig-name descname"><span class="pre">retrieveItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Inventory.retrieveItem" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">retrieveItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#py2hackCraft.modules.ItemStack" title="py2hackCraft.modules.ItemStack"><span class="pre">ItemStack</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Inventory.retrieveItem" title="Link to this definition"></a></dt>
 <dd><p>チェストを開いたエンティティーのインベントリからこのインベントリからアイテムを取り出す</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>slot1</strong> (<em>int</em>) -- 格納先のアイテムのスロット番号</p></li>
-<li><p><strong>slot2</strong> (<em>int</em>) -- 引き出し元のアイテムのスロット番号</p></li>
+<li><p><strong>slot</strong> (<em>int</em>) -- 格納先になるペットのアイテムスロット番号</p></li>
+<li><p><strong>item</strong> (<a class="reference internal" href="#py2hackCraft.modules.ItemStack" title="py2hackCraft.modules.ItemStack"><em>ItemStack</em></a>) -- 引き出し元になるチェストのアイテム</p></li>
 </ul>
 </dd>
 </dl>
@@ -1246,13 +1271,13 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Inventory.storeItem">
-<span class="sig-name descname"><span class="pre">storeItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slot1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Inventory.storeItem" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">storeItem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#py2hackCraft.modules.ItemStack" title="py2hackCraft.modules.ItemStack"><span class="pre">ItemStack</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Inventory.storeItem" title="Link to this definition"></a></dt>
 <dd><p>チェストを開いたエンティティーのインベントリからこのインベントリにアイテムを入れる</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>slot1</strong> (<em>int</em>) -- 引き出し元のアイテムのスロット番号</p></li>
-<li><p><strong>slot2</strong> (<em>int</em>) -- 格納先のアイテムのスロット番号</p></li>
+<li><p><strong>item</strong> (<a class="reference internal" href="#py2hackCraft.modules.ItemStack" title="py2hackCraft.modules.ItemStack"><em>ItemStack</em></a>) -- 引き出し元になるペットのアイテム</p></li>
+<li><p><strong>slot</strong> (<em>int</em>) -- 格納先になるチェストのアイテムスロット番号</p></li>
 </ul>
 </dd>
 </dl>

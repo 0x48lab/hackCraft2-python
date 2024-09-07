@@ -5,6 +5,7 @@ import json
 import logging
 from dataclasses import dataclass
 from typing import Callable, Any
+from typing import Optional
 
 def str_to_bool(s):
     """
@@ -172,7 +173,7 @@ class Side:
     top = "Top"
     bottom = "Bottom"
 
-@dataclass
+@dataclass(frozen=True)
 class Location:
     """
     座標を表すデータクラス
@@ -188,7 +189,7 @@ class Location:
     z: int
     world: str = "world"
 
-@dataclass
+@dataclass(frozen=True)
 class InteractEvent:
     """
     クリックイベントを表すデータクラス
@@ -218,7 +219,7 @@ class InteractEvent:
     y: int = 0 
     z: int = 0
 
-@dataclass
+@dataclass(frozen=True)
 class EventMessage:
     """
     イベントメッセージを表すデータクラス
@@ -234,7 +235,7 @@ class EventMessage:
     message: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class ChatMessage:
     """
     チャットメッセージを表すデータクラス
@@ -249,7 +250,7 @@ class ChatMessage:
     entityUuid: str
     message: str
 
-@dataclass
+@dataclass(frozen=True)
 class RedstonePower:
     """
     レッドストーン信号を表すデータクラス
@@ -262,7 +263,7 @@ class RedstonePower:
     oldCurrent: int
     newCurrent: int
 
-@dataclass
+@dataclass(frozen=True)
 class Block:
     """
     ブロックを表すデータクラス
@@ -297,7 +298,7 @@ class Block:
     z: int = 0
     world: str = "world"
 
-@dataclass
+@dataclass(frozen=True)
 class ItemStack:
     slot: int = 0
     name: str = "air"
@@ -364,11 +365,12 @@ class Inventory:
     """
     インベントリを表すクラス
     """
-    def __init__(self, client: _WebSocketClient, entityUUID: str, world: str, x: int, y: int, z:int, size:int):
+    def __init__(self, client: _WebSocketClient, entityUUID: str, world: str, x: int, y: int, z:int, size:int, items: list):
         self.client = client
         self.entityUUID = entityUUID
         self.location = Location(x, y, z, world)
         self.size = size
+        self.items = items
 
     def getItem(self, slot: int) -> ItemStack :
         """
@@ -401,25 +403,25 @@ class Inventory:
         """
         self.client.sendCall(self.entityUUID, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
 
-    def storeItem(self, slot1: int, slot2: int):
+    def storeItem(self, item: ItemStack, slot: int):
         """
         チェストを開いたエンティティーのインベントリからこのインベントリにアイテムを入れる
 
         Args:
-            slot1 (int): 引き出し元のアイテムのスロット番号
-            slot2 (int): 格納先のアイテムのスロット番号        
+            item (ItemStack): 引き出し元になるペットのアイテム
+            slot (int): 格納先になるチェストのアイテムスロット番号        
         """
-        self.client.sendCall(self.entityUUID, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
+        self.client.sendCall(self.entityUUID, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, item.slot, slot])
 
-    def retrieveItem(self, slot1: int, slot2: int):
+    def retrieveItem(self, slot: int, item: ItemStack):
         """
         チェストを開いたエンティティーのインベントリからこのインベントリからアイテムを取り出す
 
         Args:
-            slot1 (int): 格納先のアイテムのスロット番号
-            slot2 (int): 引き出し元のアイテムのスロット番号        
+            slot (int): 格納先になるペットのアイテムスロット番号
+            item (ItemStack): 引き出し元になるチェストのアイテム        
         """
-        self.client.sendCall(self.entityUUID, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
+        self.client.sendCall(self.entityUUID, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, slot, item.slot])
 
 
 class Entity:
@@ -878,6 +880,38 @@ class Entity:
         """
         self.client.sendCall(self.uuid, "sendChat", [message])
 
+    def findNearbyBlockX(self, x: int, y: int, z: int, cord: Coordinates, block: str, maxDepth: int) -> Optional[Block]:
+        """
+        指定された座標を中心に近くのブロックを取得する
+
+        Args:
+            x (int): X座標
+            y (int): Y座標
+            z (int): Z座標
+            cord (Coordinates): 座標の種類（'', '^', '~'）
+            block (str): ブロックの名前( "water:0" など)
+            maxDepth (int): 探索する最大の深さ
+        Returns:
+            Block: 調べたブロックの情報    
+        """
+        self.client.sendCall(self.uuid, "findNearbyBlockX", [x, y, z, cord, block, maxDepth])
+    
+        print('result = ', self.client.result)
+        # resultがNoneまたは空のケースに対応
+        if not self.client.result:
+            return None
+        
+        try:
+            result = json.loads(self.client.result)
+            if not result:
+                return None
+        except json.JSONDecodeError:
+            # 例外が発生した場合、無効なJSONとして処理し、Noneを返す
+            return None
+
+        block = Block(**result)
+        return block
+
     def inspectX(self, x: int, y: int, z: int, cord: Coordinates = Coordinates.local) -> Block :
         """
         指定された座標のブロックを調べる
@@ -911,12 +945,12 @@ class Entity:
 
     def inspect(self) -> Block :
         """
-        自分のいる場所のブロックを調べる
+        自分の前方のブロックを調べる
 
         Returns:
             Block: 調べたブロックの情報    
         """
-        self.client.sendCall(self.uuid, "inspect", [0, 0, 0])
+        self.client.sendCall(self.uuid, "inspect", [0, 0, 1])
         block = Block(** json.loads(self.client.result))
         return block
 
