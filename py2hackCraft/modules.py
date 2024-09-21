@@ -797,6 +797,27 @@ class Entity:
         self.client.sendCall(self.uuid, "digX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
+    def pickupItemsX(self, x : int, y: int, z: int, cord: Coordinates = Coordinates.local) -> int :
+        """
+        指定した座標の周辺のアイテムを拾う
+
+        Args:
+            x (int): X座標
+            y (int): Y座標
+            z (int): Z座標
+            cord (Coordinates): 座標の種類（'', '^', '~'）        
+        """
+        self.client.sendCall(self.uuid, "pickupItemsX", [x, y, z, cord])
+        return int(self.client.result)
+
+    def pickupItems(self) -> int :
+        """
+        自分の周辺のアイテムを拾う
+
+        """
+        self.client.sendCall(self.uuid, "pickupItemsX", [0, 0, 0, "^"])
+        return int(self.client.result)
+
     def action(self) -> bool :
         """
         自分の前方の装置を使う
