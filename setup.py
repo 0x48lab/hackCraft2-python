@@ -5,7 +5,7 @@ long_description = (this_directory / "py2hackCraft/README.md").read_text()
 
 setup(
     name="py2hackCraft2",
-    version="1.0.33",
+    version="1.0.34",
     packages=find_packages(),
     install_requires=[
         "websocket-client"  # websocketライブラリの追加

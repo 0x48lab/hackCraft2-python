@@ -507,51 +507,51 @@ class Entity:
         else:
             return False
 
-    def forward(self) -> bool :
+    def forward(self, n=1) -> bool :
         """
-        自分を前方に移動させる
+        n歩に進む
         """
-        self.client.sendCall(self.uuid, "forward")
+        self.client.sendCall(self.uuid, "forward", [n])
         return str_to_bool(self.client.result)
 
-    def back(self) -> bool :
+    def back(self, n=1) -> bool :
         """
-        自分を後方に移動させる
+        n歩後に進む
         """
-        self.client.sendCall(self.uuid, "back")
+        self.client.sendCall(self.uuid, "back", [n])
         return str_to_bool(self.client.result)
 
-    def up(self) -> bool :
+    def up(self, n=1) -> bool :
         """
-        自分を上方に移動させる
+        n歩上に進む
         """
-        self.client.sendCall(self.uuid, "up")
+        self.client.sendCall(self.uuid, "up", [n])
         return str_to_bool(self.client.result)
 
-    def down(self) -> bool :
+    def down(self, n=1) -> bool :
         """
-        自分を下方に移動させる
+        n歩下に進む
         """
-        self.client.sendCall(self.uuid, "down")
+        self.client.sendCall(self.uuid, "down", [n])
         return str_to_bool(self.client.result)
 
-    def stepLeft(self) -> bool :
+    def stepLeft(self, n=1) -> bool :
         """
-        自分を左に移動させる
+        n歩左にステップする
         """
-        self.client.sendCall(self.uuid, "stepLeft")
+        self.client.sendCall(self.uuid, "stepLeft", [n])
         return str_to_bool(self.client.result)
 
-    def stepRight(self) -> bool :
+    def stepRight(self, n=1) -> bool :
         """
-        自分を右に移動させる
+        n歩右にステップする
         """
-        self.client.sendCall(self.uuid, "stepRight")
+        self.client.sendCall(self.uuid, "stepRight", [n])
         return str_to_bool(self.client.result)
 
     def turnLeft(self) :
         """
-        自分を左に回転させるaw
+        自分を左に回転させる
         """
         self.client.sendCall(self.uuid, "turnLeft")
 
@@ -594,6 +594,19 @@ class Entity:
             degrees (int): 回転する速度
         """
         self.client.sendCall(self.uuid, "turn", [degrees])  
+
+    def facing(self, angle: int):
+        """
+        自分を指定した方角に向かせる
+        東:270
+        西:90
+        南:0
+        北:180
+
+        Args:
+            angle (int): 方角
+        """
+        self.client.sendCall(self.uuid, "facing", [angle])  
 
     def placeX(self, x: int, y: int, z: int, cord: Coordinates=Coordinates.local, side=None,) -> bool :
         """
