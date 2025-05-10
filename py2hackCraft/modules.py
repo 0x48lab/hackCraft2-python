@@ -4,7 +4,7 @@ import time
 import json
 import logging
 from dataclasses import dataclass
-from typing import Callable, Any
+from typing import Callable, Any, List
 from typing import Optional
 
 def str_to_bool(s):
@@ -356,6 +356,14 @@ class Block:
 
 @dataclass(frozen=True)
 class ItemStack:
+    """
+    アイテムスタックを表すデータクラス
+
+    Attributes:
+        slot (int): スロット番号
+        name (str): アイテムの名前
+        amount (int): アイテムの数量
+    """
     slot: int = 0
     name: str = "air"
     amount: int = 0
@@ -417,6 +425,9 @@ class Player:
 class Inventory:
     """
     インベントリを表すクラス
+    
+    このクラスは、アルゴリズム学習のための基本的な操作を提供します。
+    検索、ソート、集計などの操作は、このクラスの基本操作を組み合わせて実装できます。
     """
     def __init__(self, client: _WebSocketClient, entity_uuid: str, world: str, x: int, y: int, z: int, size: int, items: list):
         self.client = client
@@ -431,51 +442,96 @@ class Inventory:
 
         Args:
             slot (int): 取得するアイテムのスロット番号
+
+        Returns:
+            ItemStack: 取得したアイテムの情報
+
+        Example:
+            >>> # スロット0のアイテムを取得
+            >>> item = inventory.get_item(0)
+            >>> print(f"アイテム: {item.name}, 数量: {item.amount}")
         """
         self.client.send_call(self.entity_uuid, "getInventoryItem", [self.location.x, self.location.y, self.location.z, slot])
         item_stack = ItemStack(** json.loads(self.client.result))
         return item_stack
 
-    def swap_item(self, slot1: int, slot2: int):
+    def get_all_items(self) -> List[ItemStack]:
         """
-        インベントリの内容を置き換える
+        インベントリ内の全てのアイテムを取得する
+
+        Returns:
+            List[ItemStack]: アイテムのリスト
+
+        Example:
+            >>> # 全てのアイテムを取得して表示
+            >>> items = inventory.get_all_items()
+            >>> for item in items:
+            >>>     print(f"スロット{item.slot}: {item.name} x{item.amount}")
+        """
+        items = []
+        for slot in range(self.size):
+            item = self.get_item(slot)
+            if item.name != "air":  # 空のスロットは除外
+                items.append(item)
+        return items
+
+    def swap_items(self, slot1: int, slot2: int):
+        """
+        2つのスロットのアイテムを入れ替える
 
         Args:
-            slot1 (int): 置き換え元のアイテムのスロット番号
-            slot2 (int): 置き換え先のアイテムのスロット番号
+            slot1 (int): 入れ替え元のスロット番号
+            slot2 (int): 入れ替え先のスロット番号
+
+        Example:
+            >>> # スロット0と1のアイテムを入れ替え
+            >>> inventory.swap_items(0, 1)
         """
         self.client.send_call(self.entity_uuid, "swapInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
 
-    def move_item(self, slot1: int, slot2: int):
+    def move_item(self, from_slot: int, to_slot: int):
         """
-        インベントリの内容を移動させる
+        アイテムを別のスロットに移動する
 
         Args:
-            slot1 (int): 移動元のアイテムのスロット番号
-            slot2 (int): 移動先のアイテムのスロット番号        
-        """
-        self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
+            from_slot (int): 移動元のスロット番号
+            to_slot (int): 移動先のスロット番号
 
-    def store_item(self, item: ItemStack, slot: int):
+        Example:
+            >>> # スロット0のアイテムをスロット5に移動
+            >>> inventory.move_item(0, 5)
         """
-        チェストを開いたエンティティーのインベントリからこのインベントリにアイテムを入れる
+        self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
 
-        Args:
-            item (ItemStack): 引き出し元になるペットのアイテム
-            slot (int): 格納先になるチェストのアイテムスロット番号        
+    def retrieve_from_self(self, from_item: ItemStack, to_slot: int):
         """
-        self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, item.slot, slot])
-
-    def retrieve_item(self, slot: int, item: ItemStack):
-        """
-        チェストを開いたエンティティーのインベントリからこのインベントリからアイテムを取り出す
+        自分のインベントリからチェストにアイテムを取り出す
 
         Args:
-            slot (int): 格納先になるペットのアイテムスロット番号
-            item (ItemStack): 引き出し元になるチェストのアイテム        
-        """
-        self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, slot, item.slot])
+            from_item (ItemStack): 自分のインベントリから取り出すアイテム
+            to_slot (int): チェストの格納先スロット番号
 
+        Example:
+            >>> # 自分のスロット0のアイテムをチェストのスロット5に取り出す
+            >>> my_item = entity.get_item(0)
+            >>> inventory.retrieve_from_self(my_item, 5)
+        """
+        self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_item.slot])
+
+    def store_to_self(self, from_item: ItemStack, to_slot: int):
+        """
+        チェストから自分のインベントリにアイテムを格納する
+
+        Args:
+            from_item (ItemStack): チェストから格納するアイテム
+            to_slot (int): 自分のインベントリの格納先スロット番号
+
+        Example:
+            >>> # チェストのスロット5のアイテムを自分のスロット0に格納
+            >>> chest_item = inventory.get_item(5)
+            >>> inventory.store_to_self(chest_item, 0)
+        """
+        self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, from_item.slot, to_slot])
 
 class Entity:
     """
