@@ -546,20 +546,35 @@ class Entity:
     def reset(self):
         self.client.send_call(self.uuid, "restoreArea")
 
-    def wait_for_player_chat(self):
+    def wait_for_player_chat(self) -> ChatMessage:
         """
-        チャットを受信するまでまつ
-        """
-        self.client.wait_for(self.uuid, 'onPlayerChat')
-        print('result = ', self.client.result)
-        return ChatMessage(** self.client.result)
+        プレイヤーのチャットを待つ
 
-    def wait_for_redstone_change(self):
+        Returns:
+            ChatMessage: チャットメッセージの情報
         """
-        レッドストーン信号が変わるまでまつ
+        self.client.wait_for(self.uuid, "onPlayerChat")
+        return ChatMessage(**json.loads(self.client.result))
+
+    def wait_for_redstone_change(self) -> RedstonePower:
         """
-        self.client.wait_for(self.uuid, 'onEntityRedstone')
-        return RedstonePower(** self.client.result)
+        レッドストーン信号が変わるのを待つ
+
+        Returns:
+            RedstonePower: レッドストーン信号の情報
+        """
+        self.client.wait_for(self.uuid, "onEntityRedstone")
+        return RedstonePower(**json.loads(self.client.result))
+
+    def wait_for_block_break(self) -> Block:
+        """
+        ブロックが壊されるのを待つ
+
+        Returns:
+            Block: 壊されたブロックの情報
+        """
+        self.client.wait_for(self.uuid, "onBlockBreak")
+        return Block(**json.loads(self.client.result))
 
     def set_on_message(self, callback_func: Callable[['Entity', str], Any]):
         """
@@ -828,6 +843,27 @@ class Entity:
         自分の位置のブロックを収穫する
         """
         self.client.send_call(self.uuid, "digX", [0, 0, 0])
+        return str_to_bool(self.client.result)
+
+    def dig(self) -> bool:
+        """
+        自分の前方のブロックを壊す
+        """
+        self.client.send_call(self.uuid, "digX", [0, 0, 1])
+        return str_to_bool(self.client.result)
+
+    def dig_up(self) -> bool:
+        """
+        自分の真上のブロックを壊す
+        """
+        self.client.send_call(self.uuid, "digX", [0, 1, 0])
+        return str_to_bool(self.client.result)
+
+    def dig_down(self) -> bool:
+        """
+        自分の真下のブロックを壊す
+        """
+        self.client.send_call(self.uuid, "digX", [0, -1, 0])
         return str_to_bool(self.client.result)
 
     def attack(self) -> bool:

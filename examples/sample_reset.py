@@ -5,7 +5,7 @@ from py2hackCraft.modules import Player, Entity
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
 hello.reset()
 for i in range(10):

@@ -1,5 +1,6 @@
 from py2hackCraft.modules import Player
 import time
+import json
 
 def onMessage(entity, event):
     print("Message from %s: %s" % (event.sender, event.message))
@@ -8,11 +9,11 @@ def onMessage(entity, event):
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
-hello.setOnMessage(onMessage)
+hello.set_on_message(onMessage)
 
-hello.sendMessage("hello", "hello")   
+hello.send_message("hello", "hello")   
 
 quit = input("Press Enter to quit...")
 player.logout()

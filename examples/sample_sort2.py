@@ -7,16 +7,16 @@ def selectionSort(entity: Entity):
         # 最小要素のインデックスを探す
         min_index = i
         for j in range(i+1, n):
-            if entity.getItem(min_index).amount > entity.getItem(j).amount:
+            if entity.get_item(min_index).amount > entity.get_item(j).amount:
                 min_index = j
         
         # 最小要素を未ソート部分の最初の要素と交換
-        entity.swapItem(i, min_index)
+        entity.swap_item(i, min_index)
 
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
 selectionSort(hello)
 

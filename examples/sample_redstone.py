@@ -4,11 +4,11 @@ import time
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
 try:
     while True:
-        hello.waitForRedstoneChange()    
+        hello.wait_for_redstone_change()    
         hello.up()
         hello.down()
         time.sleep(1)

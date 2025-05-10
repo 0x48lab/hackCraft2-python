@@ -4,10 +4,10 @@ from py2hackCraft.modules import Player
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
 for i in range(10):
-    hello.addForce(0, 0.6, 0)
-    hello.placeDown()
+    hello.add_force(0, 0.6, 0)
+    hello.place_down()
 
 player.logout()

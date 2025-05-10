@@ -9,11 +9,11 @@ model = genai.GenerativeModel('gemini-pro')
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 try:
     while True:
         hello.say("なにか手伝えることはありますか？")
-        chat = hello.waitForPlayerChat()
+        chat = hello.wait_for_player_chat()
         response = model.generate_content(f"これ「${chat.message}」を牛の言葉で返事してください。")
         hello.say(response.text)
         time.sleep(1)

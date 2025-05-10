@@ -7,17 +7,17 @@ def bubbleSort(chest: Inventory):
         # 最後尾の要素から順にチェック
         for j in range(0, n-i-1):
             # 隣接要素を比較し、順序が逆なら交換
-            item1 = chest.getItem(j)
-            item2 = chest.getItem(j+1)
+            item1 = chest.get_item(j)
+            item2 = chest.get_item(j+1)
             if item1.amount < item2.amount:
-                chest.swapItem(j+1, j)
+                chest.swap_items(j+1, j)
 
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
-chest = hello.openInventory(0,0,1)
+chest = hello.open_inventory(0,0,1)
 bubbleSort(chest)
 
 player.logout()

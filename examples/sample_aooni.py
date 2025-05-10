@@ -12,13 +12,13 @@ respawn_pos = (91, 72, -13)
 def onInteractEvent(entity, event):
     if( event.event == "kill"):
         if( event.type == "pet" or event.type == "player"):
-            entity.executeCommand(f"entity here {event.name} {respawn_pos[0]} {respawn_pos[1]} {respawn_pos[2]}")
+            entity.execute_command(f"entity here {event.name} {respawn_pos[0]} {respawn_pos[1]} {respawn_pos[2]}")
 
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-test = player.getEntity("hello")
-test.setOnInteractEvent(onInteractEvent)
+test = player.get_entity("hello")
+test.set_on_interact_event(onInteractEvent)
 
 
 quit = input("Press Enter to quit...")

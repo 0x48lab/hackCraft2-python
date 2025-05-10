@@ -11,12 +11,14 @@ image = file.convert('RGB')
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
 for y in range(image.height):
     for x in range(image.width):
         # 指定位置のピクセルのRGB値を取得
         rgb = image.getpixel((x, y))
         hex_color = "#{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
-        block = hello.getBlockByColor(hex_color)
-        hello.setBlock(Coordinates.local, x, image.height-y + 1, 1, block.name)
+        block = hello.get_block_by_color(hex_color)
+        hello.place_at(Coordinates.local(x, image.height-y + 1, 1), block.name)
+
+player.logout()

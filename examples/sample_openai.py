@@ -8,11 +8,11 @@ openai = OpenAI(api_key='your api token')
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 try:
     while True:
         hello.say("なにか手伝えることはありますか？")
-        chat = hello.waitForPlayerChat()
+        chat = hello.wait_for_player_chat()
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
