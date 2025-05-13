@@ -503,35 +503,33 @@ class Inventory:
         """
         self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
 
-    def retrieve_from_self(self, from_item: ItemStack, to_slot: int):
+    def retrieve_from_self(self, from_slot: int, to_slot: int):
         """
-        自分のインベントリからチェストにアイテムを取り出す
+        チェストから自分のインベントリにアイテムを取り出す
 
         Args:
-            from_item (ItemStack): 自分のインベントリから取り出すアイテム
-            to_slot (int): チェストの格納先スロット番号
-
-        Example:
-            >>> # 自分のスロット0のアイテムをチェストのスロット5に取り出す
-            >>> my_item = entity.get_item(0)
-            >>> inventory.retrieve_from_self(my_item, 5)
-        """
-        self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_item.slot])
-
-    def store_to_self(self, from_item: ItemStack, to_slot: int):
-        """
-        チェストから自分のインベントリにアイテムを格納する
-
-        Args:
-            from_item (ItemStack): チェストから格納するアイテム
+            from_slot (int): チェストの取り出し元スロット番号
             to_slot (int): 自分のインベントリの格納先スロット番号
 
         Example:
-            >>> # チェストのスロット5のアイテムを自分のスロット0に格納
-            >>> chest_item = inventory.get_item(5)
-            >>> inventory.store_to_self(chest_item, 0)
+            >>> # チェストのスロット0のアイテムを自分のスロット5に取り出す
+            >>> inventory.retrieve_from_self(0, 5)
         """
-        self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, from_item.slot, to_slot])
+        self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_slot])
+
+    def store_to_self(self, from_slot: int, to_slot: int):
+        """
+        自分のインベントリからチェストにアイテムを格納する
+
+        Args:
+            from_slot (int): 自分のインベントリの取り出し元スロット番号
+            to_slot (int): チェストの格納先スロット番号
+
+        Example:
+            >>> # 自分のスロット0のアイテムをチェストのスロット5に格納
+            >>> inventory.store_to_self(0, 5)
+        """
+        self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
 
 class Entity:
     """
@@ -873,42 +871,36 @@ class Entity:
         self.client.send_call(self.uuid, "attack")
         return str_to_bool(self.client.result)
 
-    def plant_at(self, x: int, y: int, z: int, cord: Coordinates = Coordinates.local) -> bool:
+    def plant_at(self, coords: tuple) -> bool:
         """
         指定した座標のブロックに植物を植える
 
         Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            cord (Coordinates): 座標の種類（'', '^', '~'）        
+            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
         """
+        x, y, z, cord = coords
         self.client.send_call(self.uuid, "plantX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
-    def till_at(self, x: int, y: int, z: int, cord: Coordinates = Coordinates.local) -> bool:
+    def till_at(self, coords: tuple) -> bool:
         """
         指定した座標のブロックを耕す
 
         Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            cord (Coordinates): 座標の種類（'', '^', '~'）        
+            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
         """
+        x, y, z, cord = coords
         self.client.send_call(self.uuid, "tillX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
-    def flatten_at(self, x: int, y: int, z: int, cord: Coordinates = Coordinates.local) -> bool:
+    def flatten_at(self, coords: tuple) -> bool:
         """
         指定した座標のブロックを平らにする
 
         Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            cord (Coordinates): 座標の種類（'', '^', '~'）        
+            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
         """
+        x, y, z, cord = coords
         self.client.send_call(self.uuid, "flattenX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
@@ -931,16 +923,14 @@ class Entity:
         self.client.send_call(self.uuid, "digX", [x, y, z, cord])
         return str_to_bool(self.client.result)
 
-    def pickup_items_at(self, x: int, y: int, z: int, cord: Coordinates = Coordinates.local) -> int:
+    def pickup_items_at(self, coords: tuple) -> int:
         """
         指定した座標の周辺のアイテムを拾う
 
         Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            cord (Coordinates): 座標の種類（'', '^', '~'）        
+            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
         """
+        x, y, z, cord = coords
         self.client.send_call(self.uuid, "pickupItemsX", [x, y, z, cord])
         return int(self.client.result)
 
@@ -1027,20 +1017,18 @@ class Entity:
         """
         self.client.send_call(self.uuid, "sendChat", [message])
 
-    def find_nearby_block_at(self, x: int, y: int, z: int, cord: Coordinates, block: str, max_depth: int) -> Optional[Block]:
+    def find_nearby_block_at(self, coords: tuple, block: str, max_depth: int) -> Optional[Block]:
         """
         指定された座標を中心に近くのブロックを取得する
 
         Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            cord (Coordinates): 座標の種類（'', '^', '~'）
+            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
             block (str): ブロックの名前( "water:0" など)
             max_depth (int): 探索する最大の深さ
         Returns:
             Block: 調べたブロックの情報    
         """
+        x, y, z, cord = coords
         self.client.send_call(self.uuid, "findNearbyBlockX", [x, y, z, cord, block, max_depth])
     
         print('result = ', self.client.result)
@@ -1057,18 +1045,16 @@ class Entity:
         block = Block(**result)
         return block
 
-    def inspect_at(self, x: int, y: int, z: int, cord: Coordinates = Coordinates.local) -> Block:
+    def inspect_at(self, coords: tuple) -> Block:
         """
         指定された座標のブロックを調べる
 
         Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            cord (Coordinates): 座標の種類（'', '^', '~'）
+            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
         Returns:
             Block: 調べたブロックの情報    
         """
+        x, y, z, cord = coords
         self.client.send_call(self.uuid, "inspect", [x, y, z, cord])
         block = Block(** json.loads(self.client.result))
         return block

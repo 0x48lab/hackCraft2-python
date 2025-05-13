@@ -29,11 +29,11 @@ from py2hackCraft.modules import Player
 player = Player("masafumi_t")
 player.login("localhost", 25570)
 
-hello = player.getEntity("hello")
+hello = player.get_entity("hello")
 
 for i in range(5):
     hello.forward()
-    hello.turnRight()
+    hello.turn_right()
 
 player.logout()
 ```
