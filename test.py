@@ -1,8 +1,8 @@
-from py2hackCraft.modules import Player, Entity, Coordinates
+from py2hackCraft.modules import Player, Entity, LocationFactory
 player = Player("o2nerocha")
 player.login("localhost", 25570)
 
-hello = player.getEntity("maiko")
+hello = player.get_entity("hello")
 
-hello.digX(0, 0, 5)
+hello.teleport(LocationFactory.absolute(276, 62, 92))
 

@@ -1,4 +1,4 @@
-from py2hackCraft.modules import Player
+from py2hackCraft.modules import Player, LocationFactory
 
 def transfer_items(chest):
     """
@@ -30,7 +30,8 @@ def main():
 
         # チェストを開く（座標は適宜調整してください）
         print("チェストを開きます...")
-        chest = hello.open_inventory(0, 0, 1)
+        loc = LocationFactory.local(0, 0, 1)  # 前方1ブロックの位置
+        chest = hello.open_inventory(loc)
 
         # アイテムの移動を実行
         transfer_items(chest)

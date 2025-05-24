@@ -4,8 +4,7 @@ import time
 import json
 import logging
 from dataclasses import dataclass
-from typing import Callable, Any, List
-from typing import Optional
+from typing import Callable, Any, List, Optional, NamedTuple
 
 def str_to_bool(s):
     """
@@ -25,11 +24,20 @@ def str_to_bool(s):
         raise ValueError(f"Cannot covert {s} to a boolean.")  # 有効な文字列でない場合はエラー
 
 class UninitializedClientError(Exception):
-    """WebSocketClientが初期化されていないことを示すカスタム例外"""
+    """
+    WebSocketClientが初期化されていないことを示すカスタム例外
+
+    :category: 基本クラス
+    """
     pass
 
 
 class _WebSocketClient:
+    """
+    WebSocketクライアントを表すクラス
+
+    :category: 基本クラス
+    """
     def __init__(self):
         self.lock = threading.Lock()
         self.connected = False
@@ -114,6 +122,7 @@ class _WebSocketClient:
         while not self.connected:
             time.sleep(0.1)
 
+
     def send(self, message):
         logging.debug("send sending'%s'" % message)
         self._wait_for_connection()
@@ -148,13 +157,61 @@ class _WebSocketClient:
         }
         self.send(json.dumps(message))
 
-class Coordinates:
+class Coord(NamedTuple):
     """
-    Minecraftの座標系を表すクラス
+    座標を表す名前付きタプル
+
+    :category: データクラス
+
+    Attributes:
+        x (int): X座標
+        y (int): Y座標
+        z (int): Z座標
+        cord (str): 座標系 ("": 絶対座標, "~": 相対座標, "^": ローカル座標)
+    """
+    x: int
+    y: int
+    z: int
+    cord: str
+
+@dataclass(frozen=True)
+class Location:
+    """
+    座標を表すデータクラス
+
+    :category: データクラス
+
+    Attributes:
+        x (int): X座標
+        y (int): Y座標
+        z (int): Z座標
+        world (str): ワールド名（デフォルトは"world"）
+        cord (str): 座標系（デフォルトは""（絶対座標））
+
+            - "": 絶対座標 (例: 100, 64, -200)
+
+            - "~": 相対座標 (例: ~10, ~0, ~-5)
+
+            - "^": ローカル座標 (例: ^0, ^5, ^0)
+    """
+    x: int
+    y: int
+    z: int
+    world: str = "world"
+    cord: str = ""  # デフォルトは絶対座標
+
+class LocationFactory:
+    """
+    Minecraftの座標を生成するファクトリクラス
+
+    :category: データクラス
     
     座標系の種類:
+    
     - ABSOLUTE: 絶対座標 (例: 100, 64, -200)
+
     - RELATIVE: 相対座標 (例: ~10, ~0, ~-5)
+
     - LOCAL: ローカル座標 (例: ^0, ^5, ^0)
     """
     ABSOLUTE = ""  # 絶対座標 (例: 100, 64, -200)
@@ -162,65 +219,76 @@ class Coordinates:
     LOCAL = "^"     # ローカル座標 (例: ^0, ^5, ^0)
 
     @staticmethod
-    def absolute(x: int, y: int, z: int) -> tuple:
+    def absolute(x: int, y: int, z: int, world: str = "world") -> Location:
         """
-        絶対座標を指定する
+        絶対座標を生成する
         
         Args:
             x (int): X座標
             y (int): Y座標
             z (int): Z座標
+            world (str, optional): ワールド名. デフォルトは"world".
             
         Returns:
-            tuple: (x, y, z, 座標系)
+            Location: 生成された絶対座標
             
         Example:
-            >>> Coordinates.absolute(100, 64, -200)
-            (100, 64, -200, "")
+            .. code-block:: python
+
+                loc = LocationFactory.absolute(100, 64, -200)
+                print(f"X: {loc.x}, Y: {loc.y}, Z: {loc.z}, ワールド: {loc.world}, 座標系: {loc.cord}")
         """
-        return (x, y, z, Coordinates.ABSOLUTE)
+        return Location(x, y, z, world, LocationFactory.ABSOLUTE)
     
     @staticmethod
-    def relative(x: int, y: int, z: int) -> tuple:
+    def relative(x: int, y: int, z: int, world: str = "world") -> Location:
         """
-        相対座標を指定する（自分を中心とした東西南北）
+        相対座標を生成する（自分を中心とした東西南北）
         
         Args:
             x (int): 東(+)西(-)方向の相対距離
             y (int): 上(+)下(-)方向の相対距離
             z (int): 南(+)北(-)方向の相対距離
+            world (str, optional): ワールド名. デフォルトは"world".
             
         Returns:
-            tuple: (x, y, z, 座標系)
+            Location: 生成された相対座標
             
         Example:
-            >>> Coordinates.relative(10, 0, -5)  # 東に10、北に5進む
-            (10, 0, -5, "~")
+            .. code-block:: python
+
+                loc = LocationFactory.relative(10, 0, -5)  # 東に10、北に5進む
+                print(f"X: {loc.x}, Y: {loc.y}, Z: {loc.z}, ワールド: {loc.world}, 座標系: {loc.cord}")
         """
-        return (x, y, z, Coordinates.RELATIVE)
+        return Location(x, y, z, world, LocationFactory.RELATIVE)
     
     @staticmethod
-    def local(x: int, y: int, z: int) -> tuple:
+    def local(x: int, y: int, z: int, world: str = "world") -> Location:
         """
-        ローカル座標を指定する（自分の向きを基準とした前後左右）
+        ローカル座標を生成する（自分の向きを基準とした前後左右）
         
         Args:
             x (int): 右(+)左(-)方向の相対距離
             y (int): 上(+)下(-)方向の相対距離
             z (int): 前(+)後(-)方向の相対距離
+            world (str, optional): ワールド名. デフォルトは"world".
             
         Returns:
-            tuple: (x, y, z, 座標系)
+            Location: 生成されたローカル座標
             
         Example:
-            >>> Coordinates.local(0, 5, 0)  # 自分の真上5ブロック
-            (0, 5, 0, "^")
+            .. code-block:: python
+
+                loc = LocationFactory.local(0, 5, 0)  # 自分の真上5ブロック
+                print(f"X: {loc.x}, Y: {loc.y}, Z: {loc.z}, ワールド: {loc.world}, 座標系: {loc.cord}")
         """
-        return (x, y, z, Coordinates.LOCAL)
+        return Location(x, y, z, world, LocationFactory.LOCAL)
 
 class Side:
     """
     ブロックの配置方向を表すデータクラス
+
+    :category: データクラス
     """
     right = "Right"
     left = "Left"
@@ -230,25 +298,11 @@ class Side:
     bottom = "Bottom"
 
 @dataclass(frozen=True)
-class Location:
-    """
-    座標を表すデータクラス
-
-    Attributes:
-        x (str): X座標
-        y (str): Y座標
-        z (str): Z座標
-        world (str): ワールド名
-    """
-    x: int
-    y: int
-    z: int
-    world: str = "world"
-
-@dataclass(frozen=True)
 class InteractEvent:
     """
     クリックイベントを表すデータクラス
+
+    :category: イベントクラス
 
     Attributes:
         action (str): アクションの名前
@@ -280,10 +334,13 @@ class EventMessage:
     """
     イベントメッセージを表すデータクラス
 
+    :category: イベントクラス
+
     Attributes:
+        entityUuid (str): イベントを送信したエンティティの一意の識別子（UUID）
         sender (str): 送信者の名前
         uuid (str): 送信者の一意の識別子（UUID）
-        message (str): イベントメッセージ
+        message (str): イベントメッセージの内容
     """
     entityUuid: str
     sender: str
@@ -296,9 +353,12 @@ class ChatMessage:
     """
     チャットメッセージを表すデータクラス
 
+    :category: イベントクラス
+
     Attributes:
         player (str): プレイヤー名
         uuid (str): プレイヤーの一意の識別子（UUID）
+        entityUuid (str): チャットを送信したエンティティの一意の識別子（UUID）
         message (str): プレイヤーがチャットで送信したメッセージの内容
     """
     player: str
@@ -311,7 +371,10 @@ class RedstonePower:
     """
     レッドストーン信号を表すデータクラス
 
+    :category: イベントクラス
+
     Attributes:
+        entityUuid (str): レッドストーン信号を検出したエンティティの一意の識別子（UUID）
         oldCurrent (int): 前のレッドストーン信号の強さ
         newCurrent (int): 最新のレッドストーン信号の強さ
     """
@@ -323,6 +386,8 @@ class RedstonePower:
 class Block:
     """
     ブロックを表すデータクラス
+
+    :category: データクラス
 
     Attributes:
         name (str): ブロックの種類
@@ -359,6 +424,8 @@ class ItemStack:
     """
     アイテムスタックを表すデータクラス
 
+    :category: データクラス
+
     Attributes:
         slot (int): スロット番号
         name (str): アイテムの名前
@@ -369,6 +436,11 @@ class ItemStack:
     amount: int = 0
 
 class Player:
+    """
+    プレイヤーを表すクラス
+
+    :category: 基本クラス
+    """
     def __init__(self, player: str):
         self.name = player
 
@@ -425,6 +497,8 @@ class Player:
 class Inventory:
     """
     インベントリを表すクラス
+
+    :category: 基本クラス
     
     このクラスは、アルゴリズム学習のための基本的な操作を提供します。
     検索、ソート、集計などの操作は、このクラスの基本操作を組み合わせて実装できます。
@@ -447,9 +521,11 @@ class Inventory:
             ItemStack: 取得したアイテムの情報
 
         Example:
-            >>> # スロット0のアイテムを取得
-            >>> item = inventory.get_item(0)
-            >>> print(f"アイテム: {item.name}, 数量: {item.amount}")
+            .. code-block:: python
+
+                # スロット0のアイテムを取得
+                item = inventory.get_item(0)
+                print(f"アイテム: {item.name}, 数量: {item.amount}")
         """
         self.client.send_call(self.entity_uuid, "getInventoryItem", [self.location.x, self.location.y, self.location.z, slot])
         item_stack = ItemStack(** json.loads(self.client.result))
@@ -463,10 +539,12 @@ class Inventory:
             List[ItemStack]: アイテムのリスト
 
         Example:
-            >>> # 全てのアイテムを取得して表示
-            >>> items = inventory.get_all_items()
-            >>> for item in items:
-            >>>     print(f"スロット{item.slot}: {item.name} x{item.amount}")
+            .. code-block:: python
+
+                # 全てのアイテムを取得して表示
+                items = inventory.get_all_items()
+                for item in items:
+                    print(f"スロット{item.slot}: {item.name} x{item.amount}")
         """
         items = []
         for slot in range(self.size):
@@ -484,8 +562,10 @@ class Inventory:
             slot2 (int): 入れ替え先のスロット番号
 
         Example:
-            >>> # スロット0と1のアイテムを入れ替え
-            >>> inventory.swap_items(0, 1)
+            .. code-block:: python
+
+                # スロット0と1のアイテムを入れ替え
+                inventory.swap_items(0, 1)
         """
         self.client.send_call(self.entity_uuid, "swapInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
 
@@ -498,8 +578,10 @@ class Inventory:
             to_slot (int): 移動先のスロット番号
 
         Example:
-            >>> # スロット0のアイテムをスロット5に移動
-            >>> inventory.move_item(0, 5)
+            .. code-block:: python
+
+                # スロット0のアイテムをスロット5に移動
+                inventory.move_item(0, 5)
         """
         self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
 
@@ -512,8 +594,10 @@ class Inventory:
             to_slot (int): 自分のインベントリの格納先スロット番号
 
         Example:
-            >>> # チェストのスロット0のアイテムを自分のスロット5に取り出す
-            >>> inventory.retrieve_from_self(0, 5)
+            .. code-block:: python
+
+                # チェストのスロット0のアイテムを自分のスロット5に取り出す
+                inventory.retrieve_from_self(0, 5)
         """
         self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_slot])
 
@@ -526,14 +610,123 @@ class Inventory:
             to_slot (int): チェストの格納先スロット番号
 
         Example:
-            >>> # 自分のスロット0のアイテムをチェストのスロット5に格納
-            >>> inventory.store_to_self(0, 5)
+            .. code-block:: python
+
+                # 自分のスロット0のアイテムをチェストのスロット5に格納
+                inventory.store_to_self(0, 5)
         """
         self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
+
+class Volume:
+    """
+    3D空間の領域を表すクラス
+
+    :category: データクラス
+    
+    座標系の種類:
+    - ABSOLUTE: 絶対座標 (例: 100, 64, -200)
+    - RELATIVE: 相対座標 (例: ~10, ~0, ~-5)
+    - LOCAL: ローカル座標 (例: ^0, ^5, ^0)
+    """
+    ABSOLUTE = ""  # 絶対座標 (例: 100, 64, -200)
+    RELATIVE = "~"  # 相対座標 (例: ~10, ~0, ~-5)
+    LOCAL = "^"     # ローカル座標 (例: ^0, ^5, ^0)
+
+    @staticmethod
+    def absolute(x1: int, y1: int, z1: int, x2: int, y2: int, z2: int) -> 'Volume':
+        """
+        絶対座標で領域を指定する
+        
+        Args:
+            x1 (int): 1つ目の座標のX座標
+            y1 (int): 1つ目の座標のY座標
+            z1 (int): 1つ目の座標のZ座標
+            x2 (int): 2つ目の座標のX座標
+            y2 (int): 2つ目の座標のY座標
+            z2 (int): 2つ目の座標のZ座標
+            
+        Returns:
+            Volume: 指定された領域
+            
+        Example:
+            >>> # 絶対座標(100, 64, -200)から(110, 70, -190)の領域を定義
+            >>> Volume.absolute(100, 64, -200, 110, 70, -190)
+        """
+        return Volume(x1, y1, z1, x2, y2, z2, Volume.ABSOLUTE)
+    
+    @staticmethod
+    def relative(x1: int, y1: int, z1: int, x2: int, y2: int, z2: int) -> 'Volume':
+        """
+        相対座標で領域を指定する（自分を中心とした東西南北）
+        
+        Args:
+            x1 (int): 1つ目の座標の東(+)西(-)方向の相対距離
+            y1 (int): 1つ目の座標の上(+)下(-)方向の相対距離
+            z1 (int): 1つ目の座標の南(+)北(-)方向の相対距離
+            x2 (int): 2つ目の座標の東(+)西(-)方向の相対距離
+            y2 (int): 2つ目の座標の上(+)下(-)方向の相対距離
+            z2 (int): 2つ目の座標の南(+)北(-)方向の相対距離
+            
+        Returns:
+            Volume: 指定された領域
+            
+        Example:
+            >>> # 自分の周囲5ブロックの領域を定義
+            >>> Volume.relative(-5, -5, -5, 5, 5, 5)
+        """
+        return Volume(x1, y1, z1, x2, y2, z2, Volume.RELATIVE)
+    
+    @staticmethod
+    def local(x1: int, y1: int, z1: int, x2: int, y2: int, z2: int) -> 'Volume':
+        """
+        ローカル座標で領域を指定する（自分の向きを基準とした前後左右）
+        
+        Args:
+            x1 (int): 1つ目の座標の右(+)左(-)方向の相対距離
+            y1 (int): 1つ目の座標の上(+)下(-)方向の相対距離
+            z1 (int): 1つ目の座標の前(+)後(-)方向の相対距離
+            x2 (int): 2つ目の座標の右(+)左(-)方向の相対距離
+            y2 (int): 2つ目の座標の上(+)下(-)方向の相対距離
+            z2 (int): 2つ目の座標の前(+)後(-)方向の相対距離
+            
+        Returns:
+            Volume: 指定された領域
+            
+        Example:
+            >>> # 自分の周囲5ブロックの領域を定義（向きに依存）
+            >>> Volume.local(-5, -5, -5, 5, 5, 5)
+        """
+        return Volume(x1, y1, z1, x2, y2, z2, Volume.LOCAL)
+
+    def __init__(self, x1: int, y1: int, z1: int, x2: int, y2: int, z2: int, cord: str = ""):
+        """
+        領域を定義する
+        
+        Args:
+            x1 (int): 1つ目の座標のX座標
+            y1 (int): 1つ目の座標のY座標
+            z1 (int): 1つ目の座標のZ座標
+            x2 (int): 2つ目の座標のX座標
+            y2 (int): 2つ目の座標のY座標
+            z2 (int): 2つ目の座標のZ座標
+            cord (str): 座標系 ("": 絶対座標, "~": 相対座標, "^": ローカル座標)
+            
+        Example:
+            >>> # 絶対座標で領域を定義
+            >>> Volume(100, 64, -200, 110, 70, -190)
+            >>> # 相対座標で領域を定義
+            >>> Volume(-5, -5, -5, 5, 5, 5, "~")
+            >>> # ローカル座標で領域を定義
+            >>> Volume(-5, -5, -5, 5, 5, 5, "^")
+        """
+        self.pos1 = (x1, y1, z1, cord)
+        self.pos2 = (x2, y2, z2, cord)
 
 class Entity:
     """
     エンティティを表すクラス
+
+    :category: 基本クラス
     """
     def __init__(self, client: _WebSocketClient, world: str, uuid: str):
         self.client = client
@@ -573,6 +766,65 @@ class Entity:
         """
         self.client.wait_for(self.uuid, "onBlockBreak")
         return Block(**json.loads(self.client.result))
+    
+    def get_event_message(self) -> Any:
+        self.client.send_call(self.uuid, "getEventMessage")
+        return json.loads(self.client.result)
+
+    def is_event_area(self, loc: Location) -> bool:
+        """
+        指定された座標がイベント検出範囲内かどうかを判定する
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 指定された座標がイベント検出範囲内の場合はTrue、そうでない場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 絶対座標(100, 64, -200)がイベント検出範囲内かどうかを判定
+                loc = LocationFactory.absolute(100, 64, -200)
+                entity.is_event_area(loc)
+
+            .. code-block:: python
+
+                # 自分の東10ブロック、北5ブロックの位置がイベント検出範囲内かどうかを判定
+                loc = LocationFactory.relative(10, 0, -5)
+                entity.is_event_area(loc)
+
+            .. code-block:: python
+
+                # 自分の真上5ブロックの位置がイベント検出範囲内かどうかを判定
+                loc = LocationFactory.local(0, 5, 0)
+                entity.is_event_area(loc)
+        """
+        self.client.send_call(self.uuid, "isEventArea", [loc.x, loc.y, loc.z, loc.cord])
+        return str_to_bool(self.client.result)
+
+    def set_event_area(self, volume: Volume) -> bool:
+        """
+        イベントの検出範囲を設定する
+
+        Args:
+            volume (Volume): イベントの検出範囲
+
+        Returns:
+            bool: 設定が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            >>> # 絶対座標で領域を設定
+            >>> entity.set_event_area(Volume.absolute(100, 64, -200, 110, 70, -190))
+            >>> # 相対座標で領域を設定（自分の周囲10ブロック）
+            >>> entity.set_event_area(Volume.relative(-5, -5, -5, 5, 5, 5))
+            >>> # ローカル座標で領域を設定（自分の周囲10ブロック）
+            >>> entity.set_event_area(Volume.local(-5, -5, -5, 5, 5, 5))
+        """
+        x1, y1, z1, cord = volume.pos1
+        x2, y2, z2, _ = volume.pos2
+        self.client.send_call(self.uuid, "setEventArea", [x1, y1, z1, x2, y2, z2, cord])
+        return str_to_bool(self.client.result)
 
     def set_on_message(self, callback_func: Callable[['Entity', str], Any]):
         """
@@ -605,8 +857,34 @@ class Entity:
         """
         self.client.send_call(self.uuid, "executeCommand", [command])
     
-    def open_inventory(self, x, y, z) -> Inventory:
-        self.client.send_call(self.uuid, "openInventory", [x, y, z])
+    def open_inventory(self, loc: Location) -> Inventory:
+        """
+        指定された座標のインベントリ（チェストなど）を開く
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            Inventory: 開いたインベントリの操作オブジェクト
+
+        Example:
+            .. code-block:: python
+
+                # 絶対座標(100, 64, -200)のチェストを開く
+                loc = LocationFactory.absolute(100, 64, -200)
+                chest = entity.open_inventory(loc)
+
+            .. code-block:: python
+
+                # インベントリ内のアイテムを取得
+                items = chest.get_all_items()
+
+            .. code-block:: python
+
+                # アイテムを移動
+                chest.move_item(0, 1)
+        """
+        self.client.send_call(self.uuid, "openInventory", [loc.x, loc.y, loc.z, loc.cord])
         inventory = Inventory(self.client, self.uuid, ** json.loads(self.client.result))
         return inventory
 
@@ -631,14 +909,26 @@ class Entity:
 
     def forward(self, n=1) -> bool:
         """
-        n歩に進む
+        n歩前に進む
+
+        Args:
+            n (int, optional): 進む歩数. デフォルトは1.
+
+        Returns:
+            bool: 移動が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "forward", [n])
         return str_to_bool(self.client.result)
 
     def back(self, n=1) -> bool:
         """
-        n歩後に進む
+        n歩後ろに進む
+
+        Args:
+            n (int, optional): 進む歩数. デフォルトは1.
+
+        Returns:
+            bool: 移動が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "back", [n])
         return str_to_bool(self.client.result)
@@ -646,6 +936,12 @@ class Entity:
     def up(self, n=1) -> bool:
         """
         n歩上に進む
+
+        Args:
+            n (int, optional): 進む歩数. デフォルトは1.
+
+        Returns:
+            bool: 移動が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "up", [n])
         return str_to_bool(self.client.result)
@@ -653,6 +949,12 @@ class Entity:
     def down(self, n=1) -> bool:
         """
         n歩下に進む
+
+        Args:
+            n (int, optional): 進む歩数. デフォルトは1.
+
+        Returns:
+            bool: 移動が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "down", [n])
         return str_to_bool(self.client.result)
@@ -660,6 +962,12 @@ class Entity:
     def step_left(self, n=1) -> bool:
         """
         n歩左にステップする
+
+        Args:
+            n (int, optional): 進む歩数. デフォルトは1.
+
+        Returns:
+            bool: 移動が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "stepLeft", [n])
         return str_to_bool(self.client.result)
@@ -667,6 +975,12 @@ class Entity:
     def step_right(self, n=1) -> bool:
         """
         n歩右にステップする
+
+        Args:
+            n (int, optional): 進む歩数. デフォルトは1.
+
+        Returns:
+            bool: 移動が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "stepRight", [n])
         return str_to_bool(self.client.result)
@@ -674,30 +988,53 @@ class Entity:
     def turn_left(self):
         """
         自分を左に回転させる
+
+        Returns:
+            None
         """
         self.client.send_call(self.uuid, "turnLeft")
 
     def turn_right(self):
         """
         自分を右に回転させる
+
+        Returns:
+            None
         """
         self.client.send_call(self.uuid, "turnRight")
 
     def make_sound(self) -> bool:
         """
         自分を鳴かせる
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "sound")
         return str_to_bool(self.client.result)
 
     def add_force(self, x: float, y: float, z: float) -> bool:
         """
-        前方へ移動する
+        エンティティに力を加えて移動させる
 
         Args:
-            x (float): x軸方向の加速
-            y (float): y軸方向の加速
-            z (float): z軸方向の加速
+            x (float): X軸方向の力（正の値で東方向、負の値で西方向）
+            y (float): Y軸方向の力（正の値で上方向、負の値で下方向）
+            z (float): Z軸方向の力（正の値で南方向、負の値で北方向）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 東方向に力を加える
+                entity.add_force(1.0, 0.0, 0.0)
+
+            .. code-block:: python
+
+                # 上方向にジャンプするような力を加える
+                entity.add_force(0.0, 1.0, 0.0)
         """
         self.client.send_call(self.uuid, "addForce", [x, y, z])
         return str_to_bool(self.client.result)
@@ -705,67 +1042,127 @@ class Entity:
     def jump(self):
         """
         ジャンプさせる
+
+        Returns:
+            None
         """
-        self.client.send_call(self.uuid, "jump")  
+        self.client.send_call(self.uuid, "jump")
 
     def turn(self, degrees: int):
         """
-        自分を回転させる
+        エンティティを指定した角度だけ回転させる
 
         Args:
-            degrees (int): 回転する速度
+            degrees (int): 回転する角度（正の値で右回り、負の値で左回り）
+                例: 90で右に90度回転、-90で左に90度回転
+
+        Returns:
+            None
+
+        Example:
+            .. code-block:: python
+
+                # 右に90度回転
+                entity.turn(90)
+
+            .. code-block:: python
+
+                # 左に180度回転
+                entity.turn(-180)
         """
-        self.client.send_call(self.uuid, "turn", [degrees])  
+        self.client.send_call(self.uuid, "turn", [degrees])
 
     def facing(self, angle: int):
         """
-        自分を指定した方角に向かせる
-        東:270
-        西:90
-        南:0
-        北:180
+        エンティティを指定した方角に向かせる
 
         Args:
-            angle (int): 方角
-        """
-        self.client.send_call(self.uuid, "facing", [angle])  
+            angle (int): 向く方角（度数法）
+                - 0: 南
+                - 90: 西
+                - 180: 北
+                - 270: 東
 
-    def place_at(self, coords: tuple, side=None) -> bool:
+        Returns:
+            None
+
+        Example:
+            .. code-block:: python
+
+                # 北を向く
+                entity.facing(180)
+
+            .. code-block:: python
+
+                # 東を向く
+                entity.facing(270)
+        """
+        self.client.send_call(self.uuid, "facing", [angle])
+
+    def place_at(self, loc: Location, side=None) -> bool:
         """
         指定した座標にブロックを設置する
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
-            side (str): 設置する面
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+            side (str, optional): ブロックを設置する面
+                - Side.right: 右面
+                - Side.left: 左面
+                - Side.front: 前面
+                - Side.back: 後面
+                - Side.top: 上面
+                - Side.bottom: 下面
+
+                Noneの場合は自動的に適切な面を選択
+
+        Returns:
+            bool: 設置が成功した場合はTrue、失敗した場合はFalse
 
         Example:
-            >>> # 絶対座標(100, 64, -200)にブロックを設置
-            >>> entity.place_at(Coordinates.absolute(100, 64, -200))
-            >>> # 自分の東10ブロック、北5ブロックの位置にブロックを設置
-            >>> entity.place_at(Coordinates.relative(10, 0, -5))
-            >>> # 自分の真上5ブロックの位置にブロックを設置
-            >>> entity.place_at(Coordinates.local(0, 5, 0))
-        """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "placeX", [x, y, z, cord, side])
-        return str_to_bool(self.client.result)
+            .. code-block:: python
 
-    def place_here(self, x: int, y: int, z: int, side=None) -> bool:
-        """
-        自分を中心に指定した座標にブロックを設置する
+                # 絶対座標(100, 64, -200)にブロックを設置
+                loc = LocationFactory.absolute(100, 64, -200)
+                entity.place_at(loc)
 
-        Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
-            side (str): 設置する面
+            .. code-block:: python
+
+                # 自分の東10ブロックの位置にブロックを右面に設置
+                loc = LocationFactory.relative(10, 0, 0)
+                entity.place_at(loc, Side.right)
         """
-        self.client.send_call(self.uuid, "placeX", [x, y, z, "^", side])
+        self.client.send_call(self.uuid, "placeX", [loc.x, loc.y, loc.z, loc.cord, side])
         return str_to_bool(self.client.result)
 
     def place(self, side=None) -> bool:
         """
         自分の前方にブロックを設置する
+
+        Args:
+            side (str, optional): ブロックを設置する面
+                - Side.right: 右面
+                - Side.left: 左面
+                - Side.front: 前面
+                - Side.back: 後面
+                - Side.top: 上面
+                - Side.bottom: 下面
+
+                Noneの場合は自動的に適切な面を選択
+
+        Returns:
+            bool: 設置が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 前方にブロックを設置
+                entity.place()
+
+            .. code-block:: python
+
+                # 前方のブロックを右面に設置
+                entity.place(Side.right)
         """
         self.client.send_call(self.uuid, "placeFront", [side])
         return str_to_bool(self.client.result)
@@ -773,6 +1170,31 @@ class Entity:
     def place_up(self, side=None) -> bool:
         """
         自分の真上にブロックを設置する
+
+        Args:
+            side (str, optional): ブロックを設置する面
+                - Side.right: 右面
+                - Side.left: 左面
+                - Side.front: 前面
+                - Side.back: 後面
+                - Side.top: 上面
+                - Side.bottom: 下面
+
+                Noneの場合は自動的に適切な面を選択
+
+        Returns:
+            bool: 設置が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 真上にブロックを設置
+                entity.place_up()
+
+            .. code-block:: python
+
+                # 真上のブロックを上面に設置
+                entity.place_up(Side.top)
         """
         self.client.send_call(self.uuid, "placeUp", [side])
         return str_to_bool(self.client.result)
@@ -780,44 +1202,73 @@ class Entity:
     def place_down(self, side=None) -> bool:
         """
         自分の真下にブロックを設置する
+
+        Args:
+            side (str, optional): ブロックを設置する面
+                - Side.right: 右面
+                - Side.left: 左面
+                - Side.front: 前面
+                - Side.back: 後面
+                - Side.top: 上面
+                - Side.bottom: 下面
+
+                Noneの場合は自動的に適切な面を選択
+
+        Returns:
+            bool: 設置が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 真下にブロックを設置
+                entity.place_down()
+
+            .. code-block:: python
+
+                # 真下のブロックを下面に設置
+                entity.place_down(Side.bottom)
         """
         self.client.send_call(self.uuid, "placeDown", [side])
         return str_to_bool(self.client.result)
 
-    def use_item_at(self, coords: tuple) -> bool:
+    def use_item_at(self, loc: Location) -> bool:
         """
         指定した座標にアイテムを使う
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
 
         Example:
-            >>> # 絶対座標(100, 64, -200)でアイテムを使用
-            >>> entity.use_item_at(Coordinates.absolute(100, 64, -200))
-            >>> # 自分の東10ブロック、北5ブロックの位置でアイテムを使用
-            >>> entity.use_item_at(Coordinates.relative(10, 0, -5))
-            >>> # 自分の真上5ブロックの位置でアイテムを使用
-            >>> entity.use_item_at(Coordinates.local(0, 5, 0))
-        """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "useItemX", [x, y, z, cord])
-        return str_to_bool(self.client.result)
+            .. code-block:: python
 
-    def use_item_here(self, x: int, y: int, z: int) -> bool:
-        """
-        自分を中心に指定した座標にアイテムを使う
+                # 絶対座標(100, 64, -200)でアイテムを使用
+                loc = LocationFactory.absolute(100, 64, -200)
+                entity.use_item_at(loc)
 
-        Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
+            .. code-block:: python
+
+                # 自分の東10ブロック、北5ブロックの位置でアイテムを使用
+                loc = LocationFactory.relative(10, 0, -5)
+                entity.use_item_at(loc)
+
+            .. code-block:: python
+
+                # 自分の真上5ブロックの位置でアイテムを使用
+                loc = LocationFactory.local(0, 5, 0)
+                entity.use_item_at(loc)
         """
-        self.client.send_call(self.uuid, "useItemX", [x, y, z, "^"])
+        self.client.send_call(self.uuid, "useItemX", [loc.x, loc.y, loc.z, loc.cord])
         return str_to_bool(self.client.result)
 
     def use_item(self) -> bool:
         """
         自分の前方にアイテムを使う
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "useItemFront")
         return str_to_bool(self.client.result)
@@ -825,6 +1276,9 @@ class Entity:
     def use_item_up(self) -> bool:
         """
         自分の真上にアイテムを使う
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "useItemUp")
         return str_to_bool(self.client.result)
@@ -832,6 +1286,9 @@ class Entity:
     def use_item_down(self) -> bool:
         """
         自分の真下にアイテムを使う
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "useItemDown")
         return str_to_bool(self.client.result)
@@ -839,6 +1296,9 @@ class Entity:
     def harvest(self) -> bool:
         """
         自分の位置のブロックを収穫する
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "digX", [0, 0, 0])
         return str_to_bool(self.client.result)
@@ -846,6 +1306,9 @@ class Entity:
     def dig(self) -> bool:
         """
         自分の前方のブロックを壊す
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "digX", [0, 0, 1])
         return str_to_bool(self.client.result)
@@ -853,6 +1316,9 @@ class Entity:
     def dig_up(self) -> bool:
         """
         自分の真上のブロックを壊す
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "digX", [0, 1, 0])
         return str_to_bool(self.client.result)
@@ -860,6 +1326,9 @@ class Entity:
     def dig_down(self) -> bool:
         """
         自分の真下のブロックを壊す
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "digX", [0, -1, 0])
         return str_to_bool(self.client.result)
@@ -867,76 +1336,103 @@ class Entity:
     def attack(self) -> bool:
         """
         自分の前方を攻撃する
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "attack")
         return str_to_bool(self.client.result)
 
-    def plant_at(self, coords: tuple) -> bool:
+    def plant_at(self, loc: Location) -> bool:
         """
         指定した座標のブロックに植物を植える
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "plantX", [x, y, z, cord])
+        self.client.send_call(self.uuid, "plantX", [loc.x, loc.y, loc.z, loc.cord])
         return str_to_bool(self.client.result)
 
-    def till_at(self, coords: tuple) -> bool:
+    def till_at(self, loc: Location) -> bool:
         """
         指定した座標のブロックを耕す
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "tillX", [x, y, z, cord])
+        self.client.send_call(self.uuid, "tillX", [loc.x, loc.y, loc.z, loc.cord])
         return str_to_bool(self.client.result)
 
-    def flatten_at(self, coords: tuple) -> bool:
+    def flatten_at(self, loc: Location) -> bool:
         """
         指定した座標のブロックを平らにする
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "flattenX", [x, y, z, cord])
+        self.client.send_call(self.uuid, "flattenX", [loc.x, loc.y, loc.z, loc.cord])
         return str_to_bool(self.client.result)
 
-    def dig_at(self, coords: tuple) -> bool:
+    def dig_at(self, loc: Location) -> bool:
         """
         指定した座標のブロックを壊す
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
 
         Example:
-            >>> # 絶対座標(100, 64, -200)のブロックを壊す
-            >>> entity.dig_at(Coordinates.absolute(100, 64, -200))
-            >>> # 自分の東10ブロック、北5ブロックの位置のブロックを壊す
-            >>> entity.dig_at(Coordinates.relative(10, 0, -5))
-            >>> # 自分の真上5ブロックの位置のブロックを壊す
-            >>> entity.dig_at(Coordinates.local(0, 5, 0))
+            .. code-block:: python
+
+                # 絶対座標(100, 64, -200)のブロックを壊す
+                loc = LocationFactory.absolute(100, 64, -200)
+                entity.dig_at(loc)
+
+            .. code-block:: python
+
+                # 自分の東10ブロック、北5ブロックの位置のブロックを壊す
+                loc = LocationFactory.relative(10, 0, -5)
+                entity.dig_at(loc)
+
+            .. code-block:: python
+
+                # 自分の真上5ブロックの位置のブロックを壊す
+                loc = LocationFactory.local(0, 5, 0)
+                entity.dig_at(loc)
         """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "digX", [x, y, z, cord])
+        self.client.send_call(self.uuid, "digX", [loc.x, loc.y, loc.z, loc.cord])
         return str_to_bool(self.client.result)
 
-    def pickup_items_at(self, coords: tuple) -> int:
+    def pickup_items_at(self, loc: Location) -> int:
         """
         指定した座標の周辺のアイテムを拾う
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            int: 拾ったアイテムの数
         """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "pickupItemsX", [x, y, z, cord])
+        self.client.send_call(self.uuid, "pickupItemsX", [loc.x, loc.y, loc.z, loc.cord])
         return int(self.client.result)
 
     def action(self) -> bool:
         """
         自分の前方の装置を使う
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "actionFront")
         return str_to_bool(self.client.result)
@@ -944,6 +1440,9 @@ class Entity:
     def action_up(self) -> bool:
         """
         自分の真上の装置を使う
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "actionUp")
         return str_to_bool(self.client.result)
@@ -951,17 +1450,36 @@ class Entity:
     def action_down(self) -> bool:
         """
         自分の真下の装置を使う
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "actionDown")
         return str_to_bool(self.client.result)
 
     def set_item(self, slot: int, block: str) -> bool:
         """
-        自分のインベントリにアイテムを設定する
+        自分のインベントリの指定したスロットにアイテムを設定する
 
         Args:
-            slot (int): 設定するアイテムのスロット番号
-            block (str): 設定するブロックの種類
+            slot (int): 設定するスロット番号（0から始まる）
+            block (str): 設定するブロックの種類（例: "stone", "dirt", "oak_planks"）
+                データ値が必要な場合は "block:data" の形式で指定
+                例: "stone:1"（花崗岩）, "wool:14"（赤の羊毛）
+
+        Returns:
+            bool: 設定が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # スロット0に石を設定
+                entity.set_item(0, "stone")
+
+            .. code-block:: python
+
+                # スロット1に花崗岩を設定
+                entity.set_item(1, "stone:1")
         """
         self.client.send_call(self.uuid, "setItem", [slot, block])
         return str_to_bool(self.client.result)
@@ -980,6 +1498,13 @@ class Entity:
     def swap_item(self, slot1: int, slot2: int) -> bool:
         """
         自分のインベントリのアイテムを置き換える
+
+        Args:
+            slot1 (int): 入れ替え元のスロット番号
+            slot2 (int): 入れ替え先のスロット番号
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "swapItem", [slot1, slot2])
         return str_to_bool(self.client.result)
@@ -987,6 +1512,13 @@ class Entity:
     def move_item(self, slot1: int, slot2: int) -> bool:
         """
         自分のインベントリのアイテムを移動させる
+
+        Args:
+            slot1 (int): 移動元のスロット番号
+            slot2 (int): 移動先のスロット番号
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "moveItem", [slot1, slot2])
         return str_to_bool(self.client.result)
@@ -994,6 +1526,12 @@ class Entity:
     def drop_item(self, slot1: int) -> bool:
         """
         自分のインベントリのアイテムを落とす
+
+        Args:
+            slot1 (int): 落とすアイテムのスロット番号
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "dropItem", [slot1])
         return str_to_bool(self.client.result)
@@ -1004,6 +1542,9 @@ class Entity:
 
         Args:
             slot (int): アイテムを持たせたいスロットの番号
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "grabItem", [slot])
         return str_to_bool(self.client.result)
@@ -1014,22 +1555,25 @@ class Entity:
 
         Args:
             message (str): エンティティがチャットで送信するメッセージの内容
+
+        Returns:
+            None
         """
         self.client.send_call(self.uuid, "sendChat", [message])
 
-    def find_nearby_block_at(self, coords: tuple, block: str, max_depth: int) -> Optional[Block]:
+    def find_nearby_block_at(self, loc: Location, block: str, max_depth: int) -> Optional[Block]:
         """
         指定された座標を中心に近くのブロックを取得する
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
             block (str): ブロックの名前( "water:0" など)
             max_depth (int): 探索する最大の深さ
+
         Returns:
-            Block: 調べたブロックの情報    
+            Optional[Block]: 見つかったブロックの情報、見つからなかった場合はNone
         """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "findNearbyBlockX", [x, y, z, cord, block, max_depth])
+        self.client.send_call(self.uuid, "findNearbyBlockX", [loc.x, loc.y, loc.z, loc.cord, block, max_depth])
     
         print('result = ', self.client.result)
         if not self.client.result:
@@ -1045,32 +1589,17 @@ class Entity:
         block = Block(**result)
         return block
 
-    def inspect_at(self, coords: tuple) -> Block:
+    def inspect_at(self, loc: Location) -> Block:
         """
         指定された座標のブロックを調べる
 
         Args:
-            coords (tuple): 座標と座標系のタプル (Coordinates.absolute/relative/localで生成)
-        Returns:
-            Block: 調べたブロックの情報    
-        """
-        x, y, z, cord = coords
-        self.client.send_call(self.uuid, "inspect", [x, y, z, cord])
-        block = Block(** json.loads(self.client.result))
-        return block
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
 
-    def inspect_here(self, x: int, y: int, z: int) -> Block:
-        """
-        自分を中心に指定された座標のブロックを調べる
-
-        Args:
-            x (int): X座標
-            y (int): Y座標
-            z (int): Z座標
         Returns:
-            Block: 調べたブロックの情報    
+            Block: 調べたブロックの情報
         """
-        self.client.send_call(self.uuid, "inspect", [x, y, z, "^"])
+        self.client.send_call(self.uuid, "inspect", [loc.x, loc.y, loc.z, loc.cord])
         block = Block(** json.loads(self.client.result))
         return block
 
@@ -1114,16 +1643,19 @@ class Entity:
             Location: 調べた位置情報    
         """
         self.client.send_call(self.uuid, "getPosition")
-        location = Location(** json.loads(self.client.result))
-        return location
+        return Location(** json.loads(self.client.result))
     
-    def teleport(self, location: Location):
+    def teleport(self, loc: Location):
         """
-        自分を指定されたワールド座標に移動する
+        自分を指定された座標に移動する
+
         Args:
-            location (Location): 座標
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            None
         """
-        self.client.send_call(self.uuid, "teleport", [location.x, location.y, location.z, Coordinates.world])
+        self.client.send_call(self.uuid, "teleport", [loc.x, loc.y, loc.z, loc.cord])
 
     def is_blocked(self) -> bool:
         """
@@ -1182,13 +1714,19 @@ class Entity:
     def get_distance(self) -> float:
         """
         自分と前方のなにかとの距離を調べる
+
+        Returns:
+            float: 前方の物体との距離
         """
         self.client.send_call(self.uuid, "getTargetDistanceFront")
-        return self.client.result
+        return float(self.client.result)
 
     def get_distance_up(self) -> float:
         """
         自分と真上のなにかとの距離を調べる
+
+        Returns:
+            float: 真上の物体との距離
         """
         self.client.send_call(self.uuid, "getTargetDistanceUp")
         return float(self.client.result)
@@ -1196,23 +1734,107 @@ class Entity:
     def get_distance_down(self) -> float:
         """
         自分と真下のなにかとの距離を調べる
+
+        Returns:
+            float: 真下の物体との距離
         """
         self.client.send_call(self.uuid, "getTargetDistanceDown")
-        return self.client.result
+        return float(self.client.result)
 
     def get_distance_target(self, uuid) -> float:
         """
         自分とターゲットとの距離を調べる
+
+        Args:
+            uuid (str): ターゲットのUUID
+
+        Returns:
+            float: ターゲットとの距離
         """
         self.client.send_call(self.uuid, "getTargetDistance", [uuid])
-        return self.client.result
+        return float(self.client.result)
+
+    def get_block(self, loc: Location) -> Block:
+        """
+        指定した座標のブロック情報を取得する
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            Block: ブロックの情報（種類、データ値、座標）
+
+        Example:
+            .. code-block:: python
+
+                # 絶対座標(100, 64, -200)のブロック情報を取得
+                loc = LocationFactory.absolute(100, 64, -200)
+                block = entity.get_block(loc)
+                print(f"ブロック: {block.name}, データ値: {block.data}")
+
+            .. code-block:: python
+
+                # 自分の東10ブロックの位置のブロック情報を取得
+                loc = LocationFactory.relative(10, 0, 0)
+                block = entity.get_block(loc)
+                print(f"ブロック: {block.name}, データ値: {block.data}")
+        """
+        self.client.send_call(self.uuid, "getBlock", [loc.x, loc.y, loc.z, loc.cord])
+        block = Block(** json.loads(self.client.result))
+        return block
+
+    def get_block_by_name(self, name: str) -> Block:
+        """
+        指定された名前のブロックを取得する
+
+        Args:
+            name (str): ブロックの名前（例: "stone", "dirt", "oak_planks"）
+                データ値が必要な場合は "block:data" の形式で指定
+                例: "stone:1"（花崗岩）, "wool:14"（赤の羊毛）
+
+        Returns:
+            Block: 指定された名前のブロックの情報
+
+        Example:
+            .. code-block:: python
+
+                # 石ブロックを取得
+                block = entity.get_block_by_name("stone")
+                print(f"ブロック: {block.name}, データ値: {block.data}")
+
+            .. code-block:: python
+
+                # 花崗岩を取得
+                block = entity.get_block_by_name("stone:1")
+                print(f"ブロック: {block.name}, データ値: {block.data}")
+        """
+        self.client.send_call(self.uuid, "blockName", [name])
+        block = Block(** json.loads(self.client.result))
+        return block
 
     def get_block_by_color(self, color: str) -> Block:
         """
-        指定された色に近いブロックを取得する
+        指定された色に最も近いブロックを取得する
 
         Args:
-            color (str): ブロックの色(HexRGB形式)
+            color (str): ブロックの色（HexRGB形式、例: "#FF0000"で赤）
+                色は16進数のRGB値で指定（#RRGGBB形式）
+
+        Returns:
+            Block: 指定された色に最も近いブロックの情報
+
+        Example:
+            .. code-block:: python
+
+                # 赤色に近いブロックを取得
+                block = entity.get_block_by_color("#FF0000")
+                print(f"ブロック: {block.name}, データ値: {block.data}")
+
+            .. code-block:: python
+
+                # 青色に近いブロックを取得
+                block = entity.get_block_by_color("#0000FF")
+                print(f"ブロック: {block.name}, データ値: {block.data}")
         """
         self.client.send_call(self.uuid, "blockColor", [color])
         block = Block(** json.loads(self.client.result))

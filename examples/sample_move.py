@@ -1,7 +1,7 @@
 from py2hackCraft.modules import Player
 
 
-player = Player("masafumi_t")
+player = Player("your name")
 player.login("localhost", 25570)
 
 hello = player.get_entity("hello")

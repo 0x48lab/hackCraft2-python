@@ -1,0 +1,1 @@
+player = Player("your name") 

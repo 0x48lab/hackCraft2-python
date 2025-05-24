@@ -1,23 +1,22 @@
 from setuptools import setup, find_packages
-from pathlib import Path
-this_directory = Path(__file__).parent
-long_description = (this_directory / "py2hackCraft/README.md").read_text()
 
 setup(
-    name="py2hackCraft2",
-    version="1.0.35",
+    name="py2hackCraft",
+    version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "websocket-client"  # websocketライブラリの追加
-        # 他にも依存する外部ライブラリがあれば、同様にリストに追加
+        "websocket-client>=1.6.0",
     ],
-    # その他のメタデータ
-    author="Masafumi Terazono",
-    author_email="masafumi_t@0x48lab.com",
-    long_description=long_description,
-    long_description_content_type='text/markdown',
-    description="These are APIs that connect to the hackCraft2 server from Python to manipulate pets.",
-    license="MIT",
-    keywords="hackCraft2",
-    url="https://pypi.org/project/py2hackCraft2/",   # プロジェクトホームページのURL
+    author="masafumi_t",
+    author_email="masafumi_t@0x48lab.com",  # 実際のメールアドレスに変更してください
+    description="Python client library for hackCraft2",
+    long_description=open("README.md").read(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/0x48lab/hackCraft2-python",  # 実際のリポジトリURLに変更してください
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires=">=3.7",
 )

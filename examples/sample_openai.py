@@ -5,7 +5,7 @@ import time
 # APIキーを設定
 openai = OpenAI(api_key='your api token')
 
-player = Player("masafumi_t")
+player = Player("your name")
 player.login("localhost", 25570)
 
 hello = player.get_entity("hello")
