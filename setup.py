@@ -13,6 +13,11 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/0x48lab/hackCraft2-python",  # 実際のリポジトリURLに変更してください
+    project_urls={
+        "Documentation": "https://0x48lab.github.io/hackCraft2-python/",
+        "Source": "https://github.com/0x48lab/hackCraft2-python",
+        "Bug Tracker": "https://github.com/0x48lab/hackCraft2-python/issues",
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
