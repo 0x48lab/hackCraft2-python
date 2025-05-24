@@ -207,7 +207,7 @@ class LocationFactory:
     :category: データクラス
     
     座標系の種類:
-    
+
     - ABSOLUTE: 絶対座標 (例: 100, 64, -200)
 
     - RELATIVE: 相対座標 (例: ~10, ~0, ~-5)
@@ -987,7 +987,7 @@ class Entity:
 
     def turn_left(self):
         """
-        自分を左に回転させる
+        左に回転させる
 
         Returns:
             None
@@ -996,7 +996,7 @@ class Entity:
 
     def turn_right(self):
         """
-        自分を右に回転させる
+        右に回転させる
 
         Returns:
             None
@@ -1005,7 +1005,7 @@ class Entity:
 
     def make_sound(self) -> bool:
         """
-        自分を鳴かせる
+        鳴かせる
 
         Returns:
             bool: 操作が成功した場合はTrue、失敗した場合はFalse
@@ -1616,7 +1616,7 @@ class Entity:
 
     def inspect_up(self) -> Block:
         """
-        自分を真上のブロックを調べる
+        真上のブロックを調べる
 
         Returns:
             Block: 調べたブロックの情報    
@@ -1647,7 +1647,7 @@ class Entity:
     
     def teleport(self, loc: Location):
         """
-        自分を指定された座標に移動する
+        指定された座標に移動する
 
         Args:
             loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
