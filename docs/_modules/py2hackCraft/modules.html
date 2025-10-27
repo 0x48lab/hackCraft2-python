@@ -286,7 +286,7 @@
 <span class="sd">    :category: データクラス</span>
 <span class="sd">    </span>
 <span class="sd">    座標系の種類:</span>
-<span class="sd">    </span>
+
 <span class="sd">    - ABSOLUTE: 絶対座標 (例: 100, 64, -200)</span>
 
 <span class="sd">    - RELATIVE: 相対座標 (例: ~10, ~0, ~-5)</span>
@@ -704,7 +704,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_uuid</span><span class="p">,</span> <span class="s2">&quot;moveInventoryItem&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">from_slot</span><span class="p">,</span> <span class="n">to_slot</span><span class="p">])</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve_from_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">to_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve_to_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">to_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        チェストから自分のインベントリにアイテムを取り出す</span>
 
@@ -720,7 +720,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_uuid</span><span class="p">,</span> <span class="s2">&quot;retrieveInventoryItem&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">to_slot</span><span class="p">,</span> <span class="n">from_slot</span><span class="p">])</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">store_to_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">to_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store_from_self</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">to_slot</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        自分のインベントリからチェストにアイテムを格納する</span>
 
@@ -1182,7 +1182,7 @@
 <a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.turn_left">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">turn_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        自分を左に回転させる</span>
+<span class="sd">        左に回転させる</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -1194,7 +1194,7 @@
 <a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.turn_right">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">turn_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        自分を右に回転させる</span>
+<span class="sd">        右に回転させる</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -1206,7 +1206,7 @@
 <a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.make_sound">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">make_sound</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        自分を鳴かせる</span>
+<span class="sd">        鳴かせる</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: 操作が成功した場合はTrue、失敗した場合はFalse</span>
@@ -1535,12 +1535,43 @@
 <a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.harvest">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">harvest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        自分の位置のブロックを収穫する</span>
+<span class="sd">        自分の位置または足元の作物を収穫する</span>
+<span class="sd">        (0, 0, 0) または (0, -1, 0) の位置にある収穫可能な作物を自動的に収穫します</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            bool: 操作が成功した場合はTrue、失敗した場合はFalse</span>
+<span class="sd">            bool: 収穫が成功した場合はTrue、失敗した場合はFalse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;digX&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;harvest&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">str_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Entity.plant">
+<a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.plant">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plant</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        自分の足元に作物を植える</span>
+<span class="sd">        常に無限で、インベントリチェックなし</span>
+<span class="sd">        (0, -1, 0) の位置にある耕地に作物を植えます</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 植えるのが成功した場合はTrue、失敗した場合はFalse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;plant&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">str_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Entity.fertilizer">
+<a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.fertilizer">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fertilizer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        自分の足元の作物に肥料（骨粉）を与える</span>
+<span class="sd">        常に無限で、インベントリチェックなし</span>
+<span class="sd">        (0, -1, 0) または (0, 0, 0) の位置にある作物に肥料を与えます</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 肥料を与えるのが成功した場合はTrue、失敗した場合はFalse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;fertilizer&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">str_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div>
 
 
@@ -1609,6 +1640,68 @@
 <span class="sd">            bool: 操作が成功した場合はTrue、失敗した場合はFalse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;plantX&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">loc</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">cord</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">str_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Entity.harvest_at">
+<a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.harvest_at">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">harvest_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">Location</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        指定した座標の作物を収穫する</span>
+<span class="sd">        常に無限で、インベントリチェックなし</span>
+<span class="sd">        指定された位置にある収穫可能な作物を収穫します</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 収穫が成功した場合はTrue、失敗した場合はFalse</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                # 絶対座標(100, 64, -200)の作物を収穫</span>
+<span class="sd">                loc = LocationFactory.absolute(100, 64, -200)</span>
+<span class="sd">                entity.harvest_at(loc)</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                # 自分の足元の作物を収穫</span>
+<span class="sd">                loc = LocationFactory.local(0, -1, 0)</span>
+<span class="sd">                entity.harvest_at(loc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;harvestAt&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">loc</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">cord</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">str_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Entity.fertilizer_at">
+<a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.fertilizer_at">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fertilizer_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">Location</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        指定した座標の作物に肥料（骨粉）を与える</span>
+<span class="sd">        常に無限で、インベントリチェックなし</span>
+<span class="sd">        指定された位置にある作物に肥料を与えます</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 肥料を与えるのが成功した場合はTrue、失敗した場合はFalse</span>
+
+<span class="sd">        Example:</span>
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                # 絶対座標(100, 64, -200)の作物に肥料を与える</span>
+<span class="sd">                loc = LocationFactory.absolute(100, 64, -200)</span>
+<span class="sd">                entity.fertilizer_at(loc)</span>
+
+<span class="sd">            .. code-block:: python</span>
+
+<span class="sd">                # 自分の足元の作物に肥料を与える</span>
+<span class="sd">                loc = LocationFactory.local(0, -1, 0)</span>
+<span class="sd">                entity.fertilizer_at(loc)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">send_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;fertilizerAt&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">loc</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">loc</span><span class="o">.</span><span class="n">cord</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">str_to_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div>
 
 
@@ -1925,7 +2018,7 @@
 <a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.inspect_up">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">inspect_up</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Block</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        自分を真上のブロックを調べる</span>
+<span class="sd">        真上のブロックを調べる</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Block: 調べたブロックの情報    </span>
@@ -1965,7 +2058,7 @@
 <a class="viewcode-back" href="../../api_reference.html#py2hackCraft.modules.Entity.teleport">[ドキュメント]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">teleport</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loc</span><span class="p">:</span> <span class="n">Location</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        自分を指定された座標に移動する</span>
+<span class="sd">        指定された座標に移動する</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）</span>
