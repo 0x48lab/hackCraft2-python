@@ -585,7 +585,7 @@ class Inventory:
         """
         self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
 
-    def retrieve_from_self(self, from_slot: int, to_slot: int):
+    def retrieve_to_self(self, from_slot: int, to_slot: int):
         """
         チェストから自分のインベントリにアイテムを取り出す
 
@@ -601,7 +601,7 @@ class Inventory:
         """
         self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_slot])
 
-    def store_to_self(self, from_slot: int, to_slot: int):
+    def store_from_self(self, from_slot: int, to_slot: int):
         """
         自分のインベントリからチェストにアイテムを格納する
 
@@ -1295,12 +1295,37 @@ class Entity:
 
     def harvest(self) -> bool:
         """
-        自分の位置のブロックを収穫する
+        自分の位置または足元の作物を収穫する
+        (0, 0, 0) または (0, -1, 0) の位置にある収穫可能な作物を自動的に収穫します
 
         Returns:
-            bool: 操作が成功した場合はTrue、失敗した場合はFalse
+            bool: 収穫が成功した場合はTrue、失敗した場合はFalse
         """
-        self.client.send_call(self.uuid, "digX", [0, 0, 0])
+        self.client.send_call(self.uuid, "harvest")
+        return str_to_bool(self.client.result)
+
+    def plant(self) -> bool:
+        """
+        自分の足元に作物を植える
+        常に無限で、インベントリチェックなし
+        (0, -1, 0) の位置にある耕地に作物を植えます
+
+        Returns:
+            bool: 植えるのが成功した場合はTrue、失敗した場合はFalse
+        """
+        self.client.send_call(self.uuid, "plant")
+        return str_to_bool(self.client.result)
+
+    def fertilizer(self) -> bool:
+        """
+        自分の足元の作物に肥料（骨粉）を与える
+        常に無限で、インベントリチェックなし
+        (0, -1, 0) または (0, 0, 0) の位置にある作物に肥料を与えます
+
+        Returns:
+            bool: 肥料を与えるのが成功した場合はTrue、失敗した場合はFalse
+        """
+        self.client.send_call(self.uuid, "fertilizer")
         return str_to_bool(self.client.result)
 
     def dig(self) -> bool:
@@ -1354,6 +1379,62 @@ class Entity:
             bool: 操作が成功した場合はTrue、失敗した場合はFalse
         """
         self.client.send_call(self.uuid, "plantX", [loc.x, loc.y, loc.z, loc.cord])
+        return str_to_bool(self.client.result)
+
+    def harvest_at(self, loc: Location) -> bool:
+        """
+        指定した座標の作物を収穫する
+        常に無限で、インベントリチェックなし
+        指定された位置にある収穫可能な作物を収穫します
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 収穫が成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 絶対座標(100, 64, -200)の作物を収穫
+                loc = LocationFactory.absolute(100, 64, -200)
+                entity.harvest_at(loc)
+
+            .. code-block:: python
+
+                # 自分の足元の作物を収穫
+                loc = LocationFactory.local(0, -1, 0)
+                entity.harvest_at(loc)
+        """
+        self.client.send_call(self.uuid, "harvestAt", [loc.x, loc.y, loc.z, loc.cord])
+        return str_to_bool(self.client.result)
+
+    def fertilizer_at(self, loc: Location) -> bool:
+        """
+        指定した座標の作物に肥料（骨粉）を与える
+        常に無限で、インベントリチェックなし
+        指定された位置にある作物に肥料を与えます
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            bool: 肥料を与えるのが成功した場合はTrue、失敗した場合はFalse
+
+        Example:
+            .. code-block:: python
+
+                # 絶対座標(100, 64, -200)の作物に肥料を与える
+                loc = LocationFactory.absolute(100, 64, -200)
+                entity.fertilizer_at(loc)
+
+            .. code-block:: python
+
+                # 自分の足元の作物に肥料を与える
+                loc = LocationFactory.local(0, -1, 0)
+                entity.fertilizer_at(loc)
+        """
+        self.client.send_call(self.uuid, "fertilizerAt", [loc.x, loc.y, loc.z, loc.cord])
         return str_to_bool(self.client.result)
 
     def till_at(self, loc: Location) -> bool:
