@@ -1920,3 +1920,137 @@ class Entity:
         self.client.send_call(self.uuid, "blockColor", [color])
         block = Block(** json.loads(self.client.result))
         return block
+
+    def _convert_recipe_pattern(self, recipe):
+        """
+        Convert recipe pattern to comma-separated string format.
+
+        Handles two input formats:
+        1. String: "1,1,1,,2,,,2" -> returns as-is
+        2. List: [1,1,1,None,2,None,None,2] -> "1,1,1,,2,,,2"
+
+        Args:
+            recipe: Recipe pattern as string or list
+
+        Returns:
+            str: Comma-separated string pattern
+
+        Raises:
+            ValueError: If pattern is invalid
+        """
+        # If already a string, validate and return
+        if isinstance(recipe, str):
+            if not recipe.strip():
+                raise ValueError("Pattern cannot be empty")
+
+            elements = recipe.split(",")
+            if len(elements) > 9:
+                raise ValueError(f"Pattern exceeds 3x3 grid size (max 9 elements, got {len(elements)})")
+
+            # Validate each non-empty element is a valid number or 'X'
+            for i, element in enumerate(elements):
+                trimmed = element.strip()
+                if trimmed:
+                    # Allow 'X' or 'x' as AIR placeholder
+                    if trimmed.upper() == 'X':
+                        continue
+                    try:
+                        int(trimmed)
+                        # Allow any integer (negative values are treated as AIR on server)
+                    except ValueError as e:
+                        if "invalid literal" in str(e):
+                            raise ValueError(f"Invalid slot number at position {i}: '{element}' (use number or 'X' for empty)")
+                        raise
+
+            return recipe
+
+        # List format
+        if isinstance(recipe, list):
+            if len(recipe) == 0:
+                raise ValueError("Pattern list cannot be empty")
+
+            if len(recipe) > 9:
+                raise ValueError(f"Pattern exceeds 3x3 grid size (max 9 elements, got {len(recipe)})")
+
+            # Validate and convert to string
+            result = []
+            for i, slot in enumerate(recipe):
+                if slot is None or slot == "":
+                    result.append("")
+                elif isinstance(slot, str):
+                    # Allow 'X' or 'x' as AIR placeholder, convert to -1
+                    if slot.strip().upper() == 'X':
+                        result.append("-1")
+                    else:
+                        raise ValueError(f"Invalid slot value at position {i}: '{slot}' (use number, None, or 'X')")
+                elif isinstance(slot, int):
+                    # Allow any integer (negative values are treated as AIR on server)
+                    result.append(str(slot))
+                else:
+                    raise ValueError(f"Invalid slot value at position {i}: {slot}")
+
+            return ",".join(result)
+
+        raise ValueError("Recipe pattern must be a string or list")
+
+    def craft(self, recipe, qty=1, slot=None):
+        """
+        ペットのインベントリにある材料を使ってアイテムをクラフトする。
+
+        引数:
+            recipe: レシピパターン（文字列またはリスト形式）
+                - 文字列形式: "1,1,1,X,2,X,X,2,X" （カンマ区切りのスロット番号、空は X または空文字）
+                - リスト形式: [1,1,1,"X",2,"X","X",2,"X"] または [1,1,1,None,2,None,None,2,None]
+                - スロット番号は0から始まる（0=スロット1）
+                - 負の数(-1など)も空気として扱われる
+            qty: クラフトする個数（デフォルト: 1）
+            slot: 結果を配置するスロット番号（デフォルト: None = 自動配置）
+
+        戻り値:
+            dict: クラフト結果（以下の構造）
+                {
+                    "success": bool,              # 成功したか
+                    "result_item": str | None,    # 作成されたアイテム名
+                    "result_quantity": int | None,# 作成された個数
+                    "requested_quantity": int,    # リクエストした個数
+                    "result_slot": int | None,    # 配置されたスロット
+                    "materials_consumed": dict,   # 消費された材料
+                    "game_mode": str,             # ゲームモード
+                    "error": dict | None          # エラー情報
+                }
+
+        使用例:
+            >>> # パンをクラフト（スロット0に小麦3つ）
+            >>> result = entity.craft("0,0,0")
+            >>> if result["success"]:
+            >>>     print(f"{result['result_item']}を{result['result_quantity']}個作ったよ！")
+
+            >>> # リスト形式でつるはしをクラフト
+            >>> result = entity.craft([3,3,3,"X",4,"X","X",4,"X"])
+
+            >>> # 複数個クラフトして、スロット10に配置
+            >>> result = entity.craft("0,0,0", qty=5, slot=10)
+
+            >>> # エラー処理
+            >>> result = entity.craft("0,0,0")
+            >>> if not result["success"]:
+            >>>     error = result["error"]
+            >>>     print(f"エラー: {error['message']}")
+            >>>     if error["code"] == "INSUFFICIENT_MATERIALS":
+            >>>         print("材料が足りないよ")
+        """
+        # Convert recipe to string format
+        pattern = self._convert_recipe_pattern(recipe)
+
+        # Prepare arguments
+        args = [pattern, qty]
+        if slot is not None:
+            args.append(slot)
+
+        # Send craft request
+        self.client.send_call(self.uuid, "craft", args)
+
+        # Parse response
+        result = json.loads(self.client.result)
+
+        return result
