@@ -1,36 +1,20 @@
-py2hackCraft ドキュメントへようこそ！
-=====================================
+.. hackCraft2 ドキュメントマスターファイル, created by
+   sphinx-quickstart on Sun Jun  2 12:43:33 2024.
+   このファイルは自由に変更できますが、少なくとも
+   `toctree` ディレクティブを含んでいる必要があります。
 
-py2hackCraftは、hackCraft2サーバーと対話するためのPythonクライアントライブラリです。
-このライブラリを使用することで、PythonからMinecraftの世界を操作することができます。
+hackCraft2のドキュメントへようこそ！======================================
 
 .. toctree::
    :maxdepth: 2
-   :caption: 目次:
+   :caption: コンテンツ:
 
-   installation
-   quickstart
-   api_reference
-   examples
+.. automodule:: py2hackCraft.modules
+   :members:
 
-インストール
------------
-
-py2hackCraftのインストール方法については、:doc:`installation` を参照してください。
-
-クイックスタート
---------------
-
-基本的な使用方法については、:doc:`quickstart` を参照してください。
-
-APIリファレンス
--------------
-
-詳細なAPIリファレンスについては、:doc:`api_reference` を参照してください。
-
-Indices and tables
+索引とテーブル
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`
+* :ref:`search`
