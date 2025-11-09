@@ -88,6 +88,7 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.can_dig"><code class="docutils literal notranslate"><span class="pre">Entity.can_dig()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.can_dig_down"><code class="docutils literal notranslate"><span class="pre">Entity.can_dig_down()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.can_dig_up"><code class="docutils literal notranslate"><span class="pre">Entity.can_dig_up()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.craft"><code class="docutils literal notranslate"><span class="pre">Entity.craft()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.dig"><code class="docutils literal notranslate"><span class="pre">Entity.dig()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.dig_at"><code class="docutils literal notranslate"><span class="pre">Entity.dig_at()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.dig_down"><code class="docutils literal notranslate"><span class="pre">Entity.dig_down()</span></code></a></li>
@@ -678,6 +679,66 @@
 <dd><p>自分の上のブロックが壊せるかどうか調べる
 :returns: 調べた結果
 :rtype: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.craft">
+<span class="sig-name descname"><span class="pre">craft</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recipe</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Entity.craft" title="Link to this definition"></a></dt>
+<dd><p>ペットのインベントリにある材料を使ってアイテムをクラフトする。</p>
+<dl>
+<dt>引数:</dt><dd><dl class="simple">
+<dt>recipe: レシピパターン（文字列またはリスト形式）</dt><dd><ul class="simple">
+<li><p>文字列形式: &quot;1,1,1,X,2,X,X,2,X&quot; （カンマ区切りのスロット番号、空は X または空文字）</p></li>
+<li><p>リスト形式: [1,1,1,&quot;X&quot;,2,&quot;X&quot;,&quot;X&quot;,2,&quot;X&quot;] または [1,1,1,None,2,None,None,2,None]</p></li>
+<li><p>スロット番号は0から始まる（0=スロット1）</p></li>
+<li><p>負の数(-1など)も空気として扱われる</p></li>
+</ul>
+</dd>
+</dl>
+<p>qty: クラフトする個数（デフォルト: 1）
+slot: 結果を配置するスロット番号（デフォルト: None = 自動配置）</p>
+</dd>
+<dt>戻り値:</dt><dd><dl>
+<dt>dict: クラフト結果（以下の構造）</dt><dd><dl class="simple">
+<dt>{</dt><dd><p>&quot;success&quot;: bool,              # 成功したか
+&quot;result_item&quot;: str | None,    # 作成されたアイテム名
+&quot;result_quantity&quot;: int | None,# 作成された個数
+&quot;requested_quantity&quot;: int,    # リクエストした個数
+&quot;result_slot&quot;: int | None,    # 配置されたスロット
+&quot;materials_consumed&quot;: dict,   # 消費された材料
+&quot;game_mode&quot;: str,             # ゲームモード
+&quot;error&quot;: dict | None          # エラー情報</p>
+</dd>
+</dl>
+<p>}</p>
+</dd>
+</dl>
+</dd>
+<dt>使用例:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># パンをクラフト（スロット0に小麦3つ）</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">craft</span><span class="p">(</span><span class="s2">&quot;0,0,0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;result_item&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">を</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;result_quantity&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">個作ったよ！&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># リスト形式でつるはしをクラフト</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">craft</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="s2">&quot;X&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s2">&quot;X&quot;</span><span class="p">,</span><span class="s2">&quot;X&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="s2">&quot;X&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># 複数個クラフトして、スロット10に配置</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">craft</span><span class="p">(</span><span class="s2">&quot;0,0,0&quot;</span><span class="p">,</span> <span class="n">qty</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">slot</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># エラー処理</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">craft</span><span class="p">(</span><span class="s2">&quot;0,0,0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">error</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー: </span><span class="si">{</span><span class="n">error</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">if</span> <span class="n">error</span><span class="p">[</span><span class="s2">&quot;code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;INSUFFICIENT_MATERIALS&quot;</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;材料が足りないよ&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
