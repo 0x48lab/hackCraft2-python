@@ -101,6 +101,15 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.is_blocked_up"><code class="docutils literal notranslate"><span class="pre">Entity.is_blocked_up()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.is_event_area"><code class="docutils literal notranslate"><span class="pre">Entity.is_event_area()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.jump"><code class="docutils literal notranslate"><span class="pre">Entity.jump()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_count_nearby"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_count_nearby()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_feed"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_feed()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_find_nearby"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_find_nearby()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_get_info"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_get_info()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_get_nearest_uuid"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_get_nearest_uuid()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_herd"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_herd()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_herd_all_nearby"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_herd_all_nearby()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_milk"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_milk()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.livestock_shear"><code class="docutils literal notranslate"><span class="pre">Entity.livestock_shear()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.make_sound"><code class="docutils literal notranslate"><span class="pre">Entity.make_sound()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.move_item"><code class="docutils literal notranslate"><span class="pre">Entity.move_item()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.open_inventory"><code class="docutils literal notranslate"><span class="pre">Entity.open_inventory()</span></code></a></li>
@@ -1170,6 +1179,232 @@ slot: 結果を配置するスロット番号（デフォルト: None = 自動�
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_count_nearby">
+<span class="sig-name descname"><span class="pre">livestock_count_nearby</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ALL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_count_nearby" title="Link to this definition"></a></dt>
+<dd><p>近くの動物を数える</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>animal_type</strong> (<em>str</em>) -- 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) -- 検索半径（ブロック数）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>動物の数</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">count</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_count_nearby</span><span class="p">(</span><span class="s2">&quot;COW&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> cows&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_feed">
+<span class="sig-name descname"><span class="pre">livestock_feed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">food_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'wheat'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_feed" title="Link to this definition"></a></dt>
+<dd><p>動物に餌をやる</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>animal_uuid</strong> (<em>str</em>) -- 動物のUUID</p></li>
+<li><p><strong>food_type</strong> (<em>str</em>) -- 餌種別（wheat, carrot, seeds, beetroot）</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">entity</span><span class="o">.</span><span class="n">livestock_feed</span><span class="p">(</span><span class="n">cow_uuid</span><span class="p">,</span> <span class="s2">&quot;wheat&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_find_nearby">
+<span class="sig-name descname"><span class="pre">livestock_find_nearby</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ALL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_find_nearby" title="Link to this definition"></a></dt>
+<dd><p>近くの動物を詳細情報付きで検索</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>animal_type</strong> (<em>str</em>) -- 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) -- 検索半径（ブロック数）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>動物情報の辞書リスト</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">animals</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_find_nearby</span><span class="p">(</span><span class="s2">&quot;SHEEP&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">animal</span> <span class="ow">in</span> <span class="n">animals</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">animal</span><span class="p">[</span><span class="s1">&#39;animalType&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> at distance </span><span class="si">{</span><span class="n">animal</span><span class="p">[</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_get_info">
+<span class="sig-name descname"><span class="pre">livestock_get_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_get_info" title="Link to this definition"></a></dt>
+<dd><p>動物の詳細情報を取得</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>animal_uuid</strong> (<em>str</em>) -- 動物のUUID</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>動物の詳細情報</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_get_info</span><span class="p">(</span><span class="n">cow_uuid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Health: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;health&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;maxHealth&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can breed: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;canBreed&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_get_nearest_uuid">
+<span class="sig-name descname"><span class="pre">livestock_get_nearest_uuid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ALL'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_get_nearest_uuid" title="Link to this definition"></a></dt>
+<dd><p>最も近い動物のUUIDを取得</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>animal_type</strong> (<em>str</em>) -- 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) -- 検索半径（ブロック数）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>動物のUUID（見つからない場合はNone）</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[str]</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cow_uuid</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_get_nearest_uuid</span><span class="p">(</span><span class="s2">&quot;COW&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">cow_uuid</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found cow: </span><span class="si">{</span><span class="n">cow_uuid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_herd">
+<span class="sig-name descname"><span class="pre">livestock_herd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cord</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'^'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_herd" title="Link to this definition"></a></dt>
+<dd><p>動物を指定座標に誘導</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>animal_uuid</strong> (<em>str</em>) -- 動物のUUID</p></li>
+<li><p><strong>x</strong> (<em>float</em>) -- 目標X座標</p></li>
+<li><p><strong>y</strong> (<em>float</em>) -- 目標Y座標</p></li>
+<li><p><strong>z</strong> (<em>float</em>) -- 目標Z座標</p></li>
+<li><p><strong>cord</strong> (<em>str</em>) -- 座標系（&quot;&quot;: 絶対座標, &quot;~&quot;: 相対座標, &quot;^&quot;: ローカル座標、デフォルト: &quot;^&quot;）</p></li>
+<li><p><strong>speed</strong> (<em>float</em>) -- 移動速度（0.5-2.0、デフォルト1.0）</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">entity</span><span class="o">.</span><span class="n">livestock_herd</span><span class="p">(</span><span class="n">cow_uuid</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_herd_all_nearby">
+<span class="sig-name descname"><span class="pre">livestock_herd_all_nearby</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">animal_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cord</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'^'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_herd_all_nearby" title="Link to this definition"></a></dt>
+<dd><p>近くの動物すべてを指定座標に誘導</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>animal_type</strong> (<em>str</em>) -- 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) -- 検索半径（ブロック数）</p></li>
+<li><p><strong>x</strong> (<em>float</em>) -- 目標X座標</p></li>
+<li><p><strong>y</strong> (<em>float</em>) -- 目標Y座標</p></li>
+<li><p><strong>z</strong> (<em>float</em>) -- 目標Z座標</p></li>
+<li><p><strong>cord</strong> (<em>str</em>) -- 座標系（&quot;&quot;: 絶対座標, &quot;~&quot;: 相対座標, &quot;^&quot;: ローカル座標、デフォルト: &quot;^&quot;）</p></li>
+<li><p><strong>speed</strong> (<em>float</em>) -- 移動速度（0.5-2.0、デフォルト1.0）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>誘導した動物の数</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">count</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_herd_all_nearby</span><span class="p">(</span><span class="s2">&quot;COW&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Herded </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> cows&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_milk">
+<span class="sig-name descname"><span class="pre">livestock_milk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cow_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_milk" title="Link to this definition"></a></dt>
+<dd><p>牛のミルクを搾る</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cow_uuid</strong> (<em>str</em>) -- 牛のUUID</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>ミルク情報 {milk, amount}</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> -- 牛以外の動物の場合</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">result</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_milk</span><span class="p">(</span><span class="n">cow_uuid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> milk bucket&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot milk: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.livestock_shear">
+<span class="sig-name descname"><span class="pre">livestock_shear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sheep_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.livestock_shear" title="Link to this definition"></a></dt>
+<dd><p>羊の毛を刈る</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sheep_uuid</strong> (<em>str</em>) -- 羊のUUID</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>羊毛情報 {wool, color, amount}</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">例外<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> -- 羊毛が生えていない、または羊以外の動物の場合</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">result</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">livestock_shear</span><span class="p">(</span><span class="n">sheep_uuid</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;amount&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> wool&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot shear: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">

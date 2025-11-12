@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="py2hackCraft2",
-    version="1.1.42",
+    version="1.1.43",
     packages=find_packages(),
     install_requires=[
         "websocket-client>=1.6.0",

@@ -2054,3 +2054,215 @@ class Entity:
         result = json.loads(self.client.result)
 
         return result
+
+    # ===== Livestock Methods =====
+
+    def livestock_count_nearby(self, animal_type: str = "ALL", radius: float = 50.0) -> int:
+        """
+        近くの動物を数える
+        
+        Args:
+            animal_type (str): 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）
+            radius (float): 検索半径（ブロック数）
+            
+        Returns:
+            int: 動物の数
+            
+        Example:
+            >>> count = entity.livestock_count_nearby("COW", 50)
+            >>> print(f"Found {count} cows")
+        """
+        self.client.send_call(self.uuid, "livestockCountNearby", [animal_type, radius])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Livestock operation failed: {result.get('message', 'Unknown error')}")
+        return result.get('data', {}).get('count', 0)
+
+    def livestock_get_nearest_uuid(self, animal_type: str = "ALL", radius: float = 50.0) -> Optional[str]:
+        """
+        最も近い動物のUUIDを取得
+        
+        Args:
+            animal_type (str): 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）
+            radius (float): 検索半径（ブロック数）
+            
+        Returns:
+            Optional[str]: 動物のUUID（見つからない場合はNone）
+            
+        Example:
+            >>> cow_uuid = entity.livestock_get_nearest_uuid("COW", 50)
+            >>> if cow_uuid:
+            >>>     print(f"Found cow: {cow_uuid}")
+        """
+        self.client.send_call(self.uuid, "livestockGetNearestUuid", [animal_type, radius])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Livestock operation failed: {result.get('message', 'Unknown error')}")
+        uuid = result.get('data', {}).get('uuid')
+        return uuid if uuid else None
+
+    def livestock_find_nearby(self, animal_type: str = "ALL", radius: float = 50.0) -> list:
+        """
+        近くの動物を詳細情報付きで検索
+        
+        Args:
+            animal_type (str): 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）
+            radius (float): 検索半径（ブロック数）
+            
+        Returns:
+            list: 動物情報の辞書リスト
+            
+        Example:
+            >>> animals = entity.livestock_find_nearby("SHEEP", 30)
+            >>> for animal in animals:
+            >>>     print(f"{animal['animalType']} at distance {animal['distance']}")
+        """
+        self.client.send_call(self.uuid, "livestockFindNearby", [animal_type, radius])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Livestock operation failed: {result.get('message', 'Unknown error')}")
+        return result.get('data', {}).get('entities', [])
+
+    def livestock_herd(self, animal_uuid: str, x: float, y: float, z: float, cord: str = "^", speed: float = 1.0) -> None:
+        """
+        動物を指定座標に誘導
+        
+        Args:
+            animal_uuid (str): 動物のUUID
+            x (float): 目標X座標
+            y (float): 目標Y座標
+            z (float): 目標Z座標
+            cord (str): 座標系（"": 絶対座標, "~": 相対座標, "^": ローカル座標、デフォルト: "^"）
+            speed (float): 移動速度（0.5-2.0、デフォルト1.0）
+            
+        Example:
+            >>> entity.livestock_herd(cow_uuid, 100, 64, 200, "^", 1.0)
+        """
+        self.client.send_call(animal_uuid, "livestockHerd", [x, y, z, cord, speed])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Herd operation failed: {result.get('message', 'Unknown error')}")
+
+    def livestock_herd_all_nearby(
+        self, 
+        animal_type: str, 
+        radius: float, 
+        x: float, 
+        y: float, 
+        z: float, 
+        cord: str = "^",
+        speed: float = 1.0
+    ) -> int:
+        """
+        近くの動物すべてを指定座標に誘導
+        
+        Args:
+            animal_type (str): 動物種別（COW, PIG, SHEEP, CHICKEN, RABBIT, HORSE, ALL）
+            radius (float): 検索半径（ブロック数）
+            x (float): 目標X座標
+            y (float): 目標Y座標
+            z (float): 目標Z座標
+            cord (str): 座標系（"": 絶対座標, "~": 相対座標, "^": ローカル座標、デフォルト: "^"）
+            speed (float): 移動速度（0.5-2.0、デフォルト1.0）
+            
+        Returns:
+            int: 誘導した動物の数
+            
+        Example:
+            >>> count = entity.livestock_herd_all_nearby("COW", 50, 100, 64, 200)
+            >>> print(f"Herded {count} cows")
+        """
+        self.client.send_call(self.uuid, "livestockHerdAllNearby", [animal_type, radius, x, y, z, cord, speed])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Herd all operation failed: {result.get('message', 'Unknown error')}")
+        return result.get('data', {}).get('count', 0)
+
+    def livestock_shear(self, sheep_uuid: str) -> dict:
+        """
+        羊の毛を刈る
+        
+        Args:
+            sheep_uuid (str): 羊のUUID
+            
+        Returns:
+            dict: 羊毛情報 {wool, color, amount}
+            
+        Raises:
+            Exception: 羊毛が生えていない、または羊以外の動物の場合
+            
+        Example:
+            >>> try:
+            >>>     result = entity.livestock_shear(sheep_uuid)
+            >>>     print(f"Got {result['amount']} {result['color']} wool")
+            >>> except Exception as e:
+            >>>     print(f"Cannot shear: {e}")
+        """
+        self.client.send_call(sheep_uuid, "livestockShear", [])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Shear operation failed: {result.get('message', 'Unknown error')}")
+        return result.get('data', {})
+
+    def livestock_milk(self, cow_uuid: str) -> dict:
+        """
+        牛のミルクを搾る
+        
+        Args:
+            cow_uuid (str): 牛のUUID
+            
+        Returns:
+            dict: ミルク情報 {milk, amount}
+            
+        Raises:
+            Exception: 牛以外の動物の場合
+            
+        Example:
+            >>> try:
+            >>>     result = entity.livestock_milk(cow_uuid)
+            >>>     print(f"Got {result['amount']} milk bucket")
+            >>> except Exception as e:
+            >>>     print(f"Cannot milk: {e}")
+        """
+        self.client.send_call(cow_uuid, "livestockMilk", [])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Milk operation failed: {result.get('message', 'Unknown error')}")
+        return result.get('data', {})
+
+    def livestock_feed(self, animal_uuid: str, food_type: str = "wheat") -> None:
+        """
+        動物に餌をやる
+        
+        Args:
+            animal_uuid (str): 動物のUUID
+            food_type (str): 餌種別（wheat, carrot, seeds, beetroot）
+            
+        Example:
+            >>> entity.livestock_feed(cow_uuid, "wheat")
+        """
+        self.client.send_call(animal_uuid, "livestockFeed", [food_type])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Feed operation failed: {result.get('message', 'Unknown error')}")
+
+    def livestock_get_info(self, animal_uuid: str) -> dict:
+        """
+        動物の詳細情報を取得
+        
+        Args:
+            animal_uuid (str): 動物のUUID
+            
+        Returns:
+            dict: 動物の詳細情報
+            
+        Example:
+            >>> info = entity.livestock_get_info(cow_uuid)
+            >>> print(f"Health: {info['health']}/{info['maxHealth']}")
+            >>> print(f"Can breed: {info['canBreed']}")
+        """
+        self.client.send_call(animal_uuid, "livestockInfo", [])
+        result = json.loads(self.client.result)
+        if not result.get('success', False):
+            raise Exception(f"Get info operation failed: {result.get('message', 'Unknown error')}")
+        return result.get('data', {}).get('entityInfo', {})
