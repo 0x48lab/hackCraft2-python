@@ -5,3 +5,4 @@ py2hackCraft2.egg-info/**
 docs/.doctrees/**
 docs/.buildinfo
 docs/_build/**
+.claude
