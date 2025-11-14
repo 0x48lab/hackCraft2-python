@@ -527,7 +527,7 @@ class Inventory:
                 item = inventory.get_item(0)
                 print(f"アイテム: {item.name}, 数量: {item.amount}")
         """
-        self.client.send_call(self.entity_uuid, "getInventoryItem", [self.location.x, self.location.y, self.location.z, slot])
+        self.client.send_call(self.entity_uuid, "getInventoryItem", [self.location.x, self.location.y, self.location.z, slot, self.location.cord])
         item_stack = ItemStack(** json.loads(self.client.result))
         return item_stack
 
@@ -567,7 +567,7 @@ class Inventory:
                 # スロット0と1のアイテムを入れ替え
                 inventory.swap_items(0, 1)
         """
-        self.client.send_call(self.entity_uuid, "swapInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2])
+        self.client.send_call(self.entity_uuid, "swapInventoryItem", [self.location.x, self.location.y, self.location.z, slot1, slot2, self.location.cord])
 
     def move_item(self, from_slot: int, to_slot: int):
         """
@@ -583,7 +583,7 @@ class Inventory:
                 # スロット0のアイテムをスロット5に移動
                 inventory.move_item(0, 5)
         """
-        self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
+        self.client.send_call(self.entity_uuid, "moveInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot, self.location.cord])
 
     def retrieve_to_self(self, from_slot: int, to_slot: int):
         """
@@ -599,7 +599,7 @@ class Inventory:
                 # チェストのスロット0のアイテムを自分のスロット5に取り出す
                 inventory.retrieve_from_self(0, 5)
         """
-        self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_slot])
+        self.client.send_call(self.entity_uuid, "retrieveInventoryItem", [self.location.x, self.location.y, self.location.z, to_slot, from_slot, self.location.cord])
 
     def store_from_self(self, from_slot: int, to_slot: int):
         """
@@ -615,7 +615,7 @@ class Inventory:
                 # 自分のスロット0のアイテムをチェストのスロット5に格納
                 inventory.store_to_self(0, 5)
         """
-        self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot])
+        self.client.send_call(self.entity_uuid, "storeInventoryItem", [self.location.x, self.location.y, self.location.z, from_slot, to_slot, self.location.cord])
 
 class Volume:
     """
@@ -2126,7 +2126,7 @@ class Entity:
     def livestock_herd(self, animal_uuid: str, x: float, y: float, z: float, cord: str = "^", speed: float = 1.0) -> None:
         """
         動物を指定座標に誘導
-        
+
         Args:
             animal_uuid (str): 動物のUUID
             x (float): 目標X座標
@@ -2134,11 +2134,11 @@ class Entity:
             z (float): 目標Z座標
             cord (str): 座標系（"": 絶対座標, "~": 相対座標, "^": ローカル座標、デフォルト: "^"）
             speed (float): 移動速度（0.5-2.0、デフォルト1.0）
-            
+
         Example:
             >>> entity.livestock_herd(cow_uuid, 100, 64, 200, "^", 1.0)
         """
-        self.client.send_call(animal_uuid, "livestockHerd", [x, y, z, cord, speed])
+        self.client.send_call(self.uuid, "livestockHerd", [animal_uuid, x, y, z, cord, speed])
         result = json.loads(self.client.result)
         if not result.get('success', False):
             raise Exception(f"Herd operation failed: {result.get('message', 'Unknown error')}")
@@ -2198,7 +2198,7 @@ class Entity:
             >>> except Exception as e:
             >>>     print(f"Cannot shear: {e}")
         """
-        self.client.send_call(sheep_uuid, "livestockShear", [])
+        self.client.send_call(self.uuid, "livestockShear", [sheep_uuid])
         result = json.loads(self.client.result)
         if not result.get('success', False):
             raise Exception(f"Shear operation failed: {result.get('message', 'Unknown error')}")
@@ -2224,7 +2224,7 @@ class Entity:
             >>> except Exception as e:
             >>>     print(f"Cannot milk: {e}")
         """
-        self.client.send_call(cow_uuid, "livestockMilk", [])
+        self.client.send_call(self.uuid, "livestockMilk", [cow_uuid])
         result = json.loads(self.client.result)
         if not result.get('success', False):
             raise Exception(f"Milk operation failed: {result.get('message', 'Unknown error')}")
@@ -2241,7 +2241,7 @@ class Entity:
         Example:
             >>> entity.livestock_feed(cow_uuid, "wheat")
         """
-        self.client.send_call(animal_uuid, "livestockFeed", [food_type])
+        self.client.send_call(self.uuid, "livestockFeed", [animal_uuid, food_type])
         result = json.loads(self.client.result)
         if not result.get('success', False):
             raise Exception(f"Feed operation failed: {result.get('message', 'Unknown error')}")
@@ -2261,7 +2261,7 @@ class Entity:
             >>> print(f"Health: {info['health']}/{info['maxHealth']}")
             >>> print(f"Can breed: {info['canBreed']}")
         """
-        self.client.send_call(animal_uuid, "livestockInfo", [])
+        self.client.send_call(self.uuid, "livestockInfo", [animal_uuid])
         result = json.loads(self.client.result)
         if not result.get('success', False):
             raise Exception(f"Get info operation failed: {result.get('message', 'Unknown error')}")
