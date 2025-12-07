@@ -143,6 +143,10 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.plant_at"><code class="docutils literal notranslate"><span class="pre">Entity.plant_at()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.pop"><code class="docutils literal notranslate"><span class="pre">Entity.pop()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.push"><code class="docutils literal notranslate"><span class="pre">Entity.push()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.read_sign"><code class="docutils literal notranslate"><span class="pre">Entity.read_sign()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.read_sign_at"><code class="docutils literal notranslate"><span class="pre">Entity.read_sign_at()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.read_sign_down"><code class="docutils literal notranslate"><span class="pre">Entity.read_sign_down()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.read_sign_up"><code class="docutils literal notranslate"><span class="pre">Entity.read_sign_up()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.say"><code class="docutils literal notranslate"><span class="pre">Entity.say()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.select_item"><code class="docutils literal notranslate"><span class="pre">Entity.select_item()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.send_message"><code class="docutils literal notranslate"><span class="pre">Entity.send_message()</span></code></a></li>
@@ -165,6 +169,10 @@
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.wait_for_block_break"><code class="docutils literal notranslate"><span class="pre">Entity.wait_for_block_break()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.wait_for_player_chat"><code class="docutils literal notranslate"><span class="pre">Entity.wait_for_player_chat()</span></code></a></li>
 <li><a class="reference internal" href="#py2hackCraft.modules.Entity.wait_for_redstone_change"><code class="docutils literal notranslate"><span class="pre">Entity.wait_for_redstone_change()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.write_sign"><code class="docutils literal notranslate"><span class="pre">Entity.write_sign()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.write_sign_at"><code class="docutils literal notranslate"><span class="pre">Entity.write_sign_at()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.write_sign_down"><code class="docutils literal notranslate"><span class="pre">Entity.write_sign_down()</span></code></a></li>
+<li><a class="reference internal" href="#py2hackCraft.modules.Entity.write_sign_up"><code class="docutils literal notranslate"><span class="pre">Entity.write_sign_up()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#py2hackCraft.modules.EventMessage"><code class="docutils literal notranslate"><span class="pre">EventMessage</span></code></a><ul>
@@ -1832,6 +1840,82 @@ slot: 結果を配置するスロット番号（デフォルト: None = 自動�
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.read_sign">
+<span class="sig-name descname"><span class="pre">read_sign</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.read_sign" title="Link to this definition"></a></dt>
+<dd><p>自分の前方の看板のテキストを読み取る</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<p>テキストを読み取る:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">text</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">read_sign</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>  <span class="c1"># &quot;1行目\n2行目\n...&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.read_sign_at">
+<span class="sig-name descname"><span class="pre">read_sign_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#py2hackCraft.modules.Location" title="py2hackCraft.modules.Location"><span class="pre">Location</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.read_sign_at" title="Link to this definition"></a></dt>
+<dd><p>指定した座標の看板のテキストを読み取る</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>loc</strong> (<a class="reference internal" href="#py2hackCraft.modules.Location" title="py2hackCraft.modules.Location"><em>Location</em></a>) -- 座標情報（LocationFactory.absolute/relative/localで生成）</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<p>相対座標で指定:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loc</span> <span class="o">=</span> <span class="n">LocationFactory</span><span class="o">.</span><span class="n">relative</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># 1ブロック上</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">read_sign_at</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ローカル座標で指定:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loc</span> <span class="o">=</span> <span class="n">LocationFactory</span><span class="o">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 前方1ブロック</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">entity</span><span class="o">.</span><span class="n">read_sign_at</span><span class="p">(</span><span class="n">loc</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.read_sign_down">
+<span class="sig-name descname"><span class="pre">read_sign_down</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.read_sign_down" title="Link to this definition"></a></dt>
+<dd><p>自分の真下の看板のテキストを読み取る</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.read_sign_up">
+<span class="sig-name descname"><span class="pre">read_sign_up</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.read_sign_up" title="Link to this definition"></a></dt>
+<dd><p>自分の真上の看板のテキストを読み取る</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="py2hackCraft.modules.Entity.say">
 <span class="sig-name descname"><span class="pre">say</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#py2hackCraft.modules.Entity.say" title="Link to this definition"></a></dt>
 <dd><p>メッセージをチャットに送る</p>
@@ -2200,6 +2284,102 @@ slot: 結果を配置するスロット番号（デフォルト: None = 自動�
 </dd>
 <dt class="field-even">戻り値の型<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#py2hackCraft.modules.RedstonePower" title="py2hackCraft.modules.RedstonePower">RedstonePower</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.write_sign">
+<span class="sig-name descname"><span class="pre">write_sign</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.write_sign" title="Link to this definition"></a></dt>
+<dd><p>自分の前方の看板にテキストを書き込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> -- 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>操作が成功した場合はTrue、失敗した場合はFalse</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<p>文字列で書き込む:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">entity</span><span class="o">.</span><span class="n">write_sign</span><span class="p">(</span><span class="s2">&quot;Hello World&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>複数行を書き込む:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">entity</span><span class="o">.</span><span class="n">write_sign</span><span class="p">([</span><span class="s2">&quot;1行目&quot;</span><span class="p">,</span> <span class="s2">&quot;2行目&quot;</span><span class="p">,</span> <span class="s2">&quot;3行目&quot;</span><span class="p">,</span> <span class="s2">&quot;4行目&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.write_sign_at">
+<span class="sig-name descname"><span class="pre">write_sign_at</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#py2hackCraft.modules.Location" title="py2hackCraft.modules.Location"><span class="pre">Location</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.write_sign_at" title="Link to this definition"></a></dt>
+<dd><p>指定した座標の看板にテキストを書き込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loc</strong> (<a class="reference internal" href="#py2hackCraft.modules.Location" title="py2hackCraft.modules.Location"><em>Location</em></a>) -- 座標情報（LocationFactory.absolute/relative/localで生成）</p></li>
+<li><p><strong>text</strong> -- 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>操作が成功した場合はTrue、失敗した場合はFalse</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<p>相対座標で指定:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loc</span> <span class="o">=</span> <span class="n">LocationFactory</span><span class="o">.</span><span class="n">relative</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># 1ブロック上</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">write_sign_at</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;相対座標のメッセージ&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ローカル座標で指定:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loc</span> <span class="o">=</span> <span class="n">LocationFactory</span><span class="o">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># 前方1ブロック</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">write_sign_at</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="s2">&quot;ローカル座標のメッセージ&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>複数行を書き込む:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loc</span> <span class="o">=</span> <span class="n">LocationFactory</span><span class="o">.</span><span class="n">local</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">entity</span><span class="o">.</span><span class="n">write_sign_at</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;1行目&quot;</span><span class="p">,</span> <span class="s2">&quot;2行目&quot;</span><span class="p">,</span> <span class="s2">&quot;3行目&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.write_sign_down">
+<span class="sig-name descname"><span class="pre">write_sign_down</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.write_sign_down" title="Link to this definition"></a></dt>
+<dd><p>自分の真下の看板にテキストを書き込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> -- 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>操作が成功した場合はTrue、失敗した場合はFalse</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="py2hackCraft.modules.Entity.write_sign_up">
+<span class="sig-name descname"><span class="pre">write_sign_up</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#py2hackCraft.modules.Entity.write_sign_up" title="Link to this definition"></a></dt>
+<dd><p>自分の真上の看板にテキストを書き込む</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> -- 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>操作が成功した場合はTrue、失敗した場合はFalse</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
