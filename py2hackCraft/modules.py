@@ -1358,6 +1358,156 @@ class Entity:
         self.client.send_call(self.uuid, "digX", [0, -1, 0])
         return str_to_bool(self.client.result)
 
+    # ===== Sign Operations =====
+
+    def write_sign(self, text) -> bool:
+        """
+        自分の前方の看板にテキストを書き込む
+
+        Args:
+            text: 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
+
+        Examples:
+            文字列で書き込む::
+
+                entity.write_sign("Hello World")
+
+            複数行を書き込む::
+
+                entity.write_sign(["1行目", "2行目", "3行目", "4行目"])
+        """
+        if isinstance(text, list):
+            text = '\n'.join(str(line) for line in text[:4])
+        self.client.send_call(self.uuid, "setSign", [str(text), "front"])
+        return str_to_bool(self.client.result)
+
+    def write_sign_up(self, text) -> bool:
+        """
+        自分の真上の看板にテキストを書き込む
+
+        Args:
+            text: 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
+        """
+        if isinstance(text, list):
+            text = '\n'.join(str(line) for line in text[:4])
+        self.client.send_call(self.uuid, "setSign", [str(text), "up"])
+        return str_to_bool(self.client.result)
+
+    def write_sign_down(self, text) -> bool:
+        """
+        自分の真下の看板にテキストを書き込む
+
+        Args:
+            text: 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
+        """
+        if isinstance(text, list):
+            text = '\n'.join(str(line) for line in text[:4])
+        self.client.send_call(self.uuid, "setSign", [str(text), "down"])
+        return str_to_bool(self.client.result)
+
+    def write_sign_at(self, loc: Location, text) -> bool:
+        """
+        指定した座標の看板にテキストを書き込む
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+            text: 書き込むテキスト。文字列またはリスト（各要素が各行になる、最大4行）
+
+        Returns:
+            bool: 操作が成功した場合はTrue、失敗した場合はFalse
+
+        Examples:
+            相対座標で指定::
+
+                loc = LocationFactory.relative(0, 1, 0)  # 1ブロック上
+                entity.write_sign_at(loc, "相対座標のメッセージ")
+
+            ローカル座標で指定::
+
+                loc = LocationFactory.local(0, 0, 1)  # 前方1ブロック
+                entity.write_sign_at(loc, "ローカル座標のメッセージ")
+
+            複数行を書き込む::
+
+                loc = LocationFactory.local(0, 0, 1)
+                entity.write_sign_at(loc, ["1行目", "2行目", "3行目"])
+        """
+        if isinstance(text, list):
+            text = '\n'.join(str(line) for line in text[:4])
+        self.client.send_call(self.uuid, "setSignX", [str(text), loc.x, loc.y, loc.z, loc.cord])
+        return str_to_bool(self.client.result)
+
+    def read_sign(self) -> str:
+        """
+        自分の前方の看板のテキストを読み取る
+
+        Returns:
+            str: 看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列
+
+        Examples:
+            テキストを読み取る::
+
+                text = entity.read_sign()
+                print(text)  # "1行目\\n2行目\\n..."
+        """
+        self.client.send_call(self.uuid, "getSign", ["front"])
+        return self.client.result if self.client.result else ""
+
+    def read_sign_up(self) -> str:
+        """
+        自分の真上の看板のテキストを読み取る
+
+        Returns:
+            str: 看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列
+        """
+        self.client.send_call(self.uuid, "getSign", ["up"])
+        return self.client.result if self.client.result else ""
+
+    def read_sign_down(self) -> str:
+        """
+        自分の真下の看板のテキストを読み取る
+
+        Returns:
+            str: 看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列
+        """
+        self.client.send_call(self.uuid, "getSign", ["down"])
+        return self.client.result if self.client.result else ""
+
+    def read_sign_at(self, loc: Location) -> str:
+        """
+        指定した座標の看板のテキストを読み取る
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            str: 看板のテキスト（複数行の場合は改行で区切られた文字列）、看板がない場合は空文字列
+
+        Examples:
+            相対座標で指定::
+
+                loc = LocationFactory.relative(0, 1, 0)  # 1ブロック上
+                text = entity.read_sign_at(loc)
+
+            ローカル座標で指定::
+
+                loc = LocationFactory.local(0, 0, 1)  # 前方1ブロック
+                text = entity.read_sign_at(loc)
+        """
+        self.client.send_call(self.uuid, "getSignX", [loc.x, loc.y, loc.z, loc.cord])
+        return self.client.result if self.client.result else ""
+
+    # ===== End Sign Operations =====
+
     def attack(self) -> bool:
         """
         自分の前方を攻撃する
