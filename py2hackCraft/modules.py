@@ -193,12 +193,16 @@ class Location:
             - "~": 相対座標 (例: ~10, ~0, ~-5)
 
             - "^": ローカル座標 (例: ^0, ^5, ^0)
+        yaw (float): 水平方向の向き（デフォルトは0）
+        pitch (float): 垂直方向の向き（デフォルトは0）
     """
     x: int
     y: int
     z: int
     world: str = "world"
     cord: str = ""  # デフォルトは絶対座標
+    yaw: float = 0
+    pitch: float = 0
 
 class LocationFactory:
     """
@@ -898,11 +902,11 @@ class Entity:
     
     def pop(self) -> bool:
         """
-        自分の位置を保存した位置に戻す
+        自分の位置を保存した位置に戻す（ブロックがあっても移動可能、向きも復元）
         """
         if(len(self.positions) > 0):
             pos = self.positions.pop()
-            self.teleport(pos)
+            self.client.send_call(self.uuid, "forceTeleport", [pos.x, pos.y, pos.z, pos.cord, pos.yaw, pos.pitch])
             return True
         else:
             return False
