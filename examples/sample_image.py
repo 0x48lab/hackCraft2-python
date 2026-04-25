@@ -19,6 +19,8 @@ for y in range(image.height):
         rgb = image.getpixel((x, y))
         hex_color = "#{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2])
         block = hello.get_block_by_color(hex_color)
-        hello.place_at(LocationFactory.local(x, image.height-y + 1, 1), block.name)
+        hello.set_item(0, block.name)
+        hello.select_item(0)
+        hello.place_at(LocationFactory.local(x, image.height-y + 1, 1))
 
 player.logout()
