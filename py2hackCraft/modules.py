@@ -2211,6 +2211,197 @@ class Entity:
 
     # ===== Livestock Methods =====
 
+    def get_biome(self) -> str:
+        """
+        自分の現在位置のバイオームを取得する
+
+        Returns:
+            str: バイオーム名（例: "PLAINS", "DESERT", "FOREST"）
+        """
+        self.client.send_call(self.uuid, "getBiome")
+        return self.client.result
+
+    def get_biome_at(self, loc: Location) -> str:
+        """
+        指定された座標のバイオームを取得する
+
+        Args:
+            loc (Location): 座標情報（LocationFactory.absolute/relative/localで生成）
+
+        Returns:
+            str: バイオーム名（例: "PLAINS", "DESERT", "FOREST"）
+        """
+        self.client.send_call(self.uuid, "getBiomeAt", [loc.x, loc.y, loc.z, loc.cord])
+        return self.client.result
+
+    def get_time(self) -> int:
+        """
+        ワールドの時刻を取得する
+
+        Returns:
+            int: ワールドの時刻（0-24000のtick値。0=朝6時, 6000=正午, 12000=夕方, 18000=真夜中）
+        """
+        self.client.send_call(self.uuid, "getTime")
+        return int(self.client.result)
+
+    def get_weather(self) -> str:
+        """
+        ワールドの天気を取得する
+
+        Returns:
+            str: 天気（"clear", "rain", "thunder"のいずれか）
+        """
+        self.client.send_call(self.uuid, "getWeather")
+        return self.client.result
+
+    def get_server_time(self) -> int:
+        """
+        サーバーの現在時刻をUnixタイムスタンプ（ミリ秒）で取得する
+        イベントログの取得開始時刻の記録に使用する
+
+        Returns:
+            int: サーバーの現在時刻（Unixタイムスタンプ、ミリ秒）
+
+        Example:
+            .. code-block:: python
+
+                start = entity.get_server_time()
+                # ... 何か作業 ...
+                log = entity.get_event_log(since=start)
+        """
+        self.client.send_call(self.uuid, "getServerTime")
+        return int(self.client.result)
+
+    def get_event_log(self, event_types: list = None, limit: int = 200) -> list:
+        """
+        ワールドのイベントログを取得する（差分取得）
+        呼び出すたびに、前回取得した位置以降の新しいイベントだけを返す
+        サーバー側でエンティティごとにカーソルを管理しているため、sinceの指定は不要
+
+        Args:
+            event_types (list, optional): 取得するイベントの種類（例: ["fish", "block_break"]）
+            limit (int): 最大取得件数（デフォルト: 200、最大: 200）
+
+        Returns:
+            list: 新しいイベントのリスト。各イベントは辞書形式
+                [{"type": "fish", "player": "taro", "item": "cod", "timestamp": 1714020000000}, ...]
+
+        Example:
+            .. code-block:: python
+
+                new_events = entity.get_event_log(["fish"])
+                for event in new_events:
+                    print(f"{event['player']}が{event['item']}を釣りました")
+        """
+        types_str = ",".join(event_types) if event_types else None
+        self.client.send_call(self.uuid, "getEventLog", [types_str, limit])
+        result = json.loads(self.client.result)
+        return result.get("events", [])
+
+    def get_event_log_status(self) -> dict:
+        """
+        イベントログの状態を取得する
+
+        Returns:
+            dict: ログの状態情報
+                {"eventCount": 1234, "maxEvents": 50000, "serverTime": 1714020000000}
+        """
+        self.client.send_call(self.uuid, "getEventLogStatus")
+        return json.loads(self.client.result)
+
+    def scan_blocks(self, volume: 'Volume') -> list:
+        """
+        指定範囲のブロックを一括取得する（最大32×32×32）
+
+        Args:
+            volume (Volume): スキャンする範囲
+
+        Returns:
+            list: ブロック情報のリスト
+                [{"name": "stone", "x": 100, "y": 64, "z": -200, ...}, ...]
+
+        Example:
+            .. code-block:: python
+
+                area = Volume.relative(-5, -5, -5, 5, 5, 5)
+                blocks = entity.scan_blocks(area)
+                print(f"{len(blocks)}ブロックをスキャンしました")
+        """
+        x1, y1, z1, cord = volume.pos1
+        x2, y2, z2, _ = volume.pos2
+        self.client.send_call(self.uuid, "scanBlocks", [x1, y1, z1, x2, y2, z2, cord])
+        return json.loads(self.client.result)
+
+    def reset_event_cursor(self):
+        """
+        イベントログのカーソルをリセットする
+        次回のget_event_log()は現在時刻以降のイベントから返すようになる
+
+        Example:
+            .. code-block:: python
+
+                entity.reset_event_cursor()
+                # ここから新しいイベントだけを取得する
+                events = entity.get_event_log(["fish"])
+        """
+        self.client.send_call(self.uuid, "resetEventCursor")
+
+    def watch_events(self, event_types: list = None, interval: int = 1, callback: Callable = None) -> list:
+        """
+        リアルタイムでイベントを監視する
+        1秒ごとに新しいイベントを取得し、callbackが設定されていれば呼び出す
+        Ctrl+C（KeyboardInterrupt）で停止し、全イベントを返す
+        サーバー側でカーソルを管理するため、差分だけが自動的に返される
+
+        Args:
+            event_types (list, optional): 監視するイベントの種類（例: ["fish", "block_break"]）
+            interval (int): ポーリング間隔（秒）。デフォルト: 1
+            callback (Callable, optional): 新しいイベントが来たときに呼ばれる関数
+                callback(new_events, all_events) の形式で呼ばれる
+                new_events: 今回新しく取得したイベントのリスト
+                all_events: これまでの全イベントのリスト
+
+        Returns:
+            list: 監視中に収集した全イベントのリスト
+
+        Example:
+            .. code-block:: python
+
+                events = entity.watch_events(["fish"])
+
+            .. code-block:: python
+
+                from IPython.display import clear_output
+                import matplotlib.pyplot as plt
+                import pandas as pd
+
+                def update_graph(new_events, all_events):
+                    clear_output(wait=True)
+                    df = pd.DataFrame(all_events)
+                    df["item"].value_counts().plot(kind="bar")
+                    plt.title(f"釣り結果（{len(df)}回）")
+                    plt.show()
+
+                events = entity.watch_events(["fish"], callback=update_graph)
+        """
+        self.reset_event_cursor()
+        all_events = []
+
+        try:
+            while True:
+                new_events = self.get_event_log(event_types=event_types)
+                if new_events:
+                    all_events.extend(new_events)
+                    if callback:
+                        callback(new_events, all_events)
+                time.sleep(interval)
+        except KeyboardInterrupt:
+            pass
+
+        return all_events
+
+    # ===== Livestock Methods =====
+
     def livestock_count_nearby(self, animal_type: str = "ALL", radius: float = 50.0) -> int:
         """
         近くの動物を数える
