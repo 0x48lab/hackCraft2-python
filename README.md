@@ -25,7 +25,7 @@ pip install py2hackCraft2
 ## 使用方法
 
 ```python
-from py2hackCraft2.modules import Player, Volume, LocationFactory
+from py2hackCraft.modules import Player, Volume, LocationFactory
 
 # プレイヤーの接続
 player = Player("your_name")
