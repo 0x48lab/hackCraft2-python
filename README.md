@@ -38,6 +38,20 @@ entity.set_event_area(Volume.local(10, 10, 10, -10, -10, -10))
 # その他の操作...
 ```
 
+### セキュア(wss)接続（Colab / リモート）
+
+Google Colab などから、HTTPS 公開トンネル（Cloudflare 等）越しに動いているサーバーへ接続する場合は `secure=True` を指定します。`port` を省略すると標準TLSポート(443)を使用します。
+
+```python
+# 公開サーバーへ wss 接続
+player.login("your-tunnel.example.com", secure=True)
+
+# 自己署名証明書や自前トンネルで証明書検証を無効化する場合（自己責任）
+player.login("self-hosted.example.com", secure=True, verify_ssl=False)
+```
+
+ローカルサーバーへは従来どおり `player.login("localhost", 25570)` で接続できます（後方互換）。
+
 ## ライセンス
 
 MIT License

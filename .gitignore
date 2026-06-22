@@ -6,3 +6,5 @@ docs/.doctrees/**
 docs/.buildinfo
 docs/_build/**
 .claude
+.specify
+specs

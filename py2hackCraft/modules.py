@@ -3,8 +3,44 @@ import threading
 import time
 import json
 import logging
+import ssl
+import functools
 from dataclasses import dataclass
 from typing import Callable, Any, List, Optional, NamedTuple
+
+# 標準のTLS(セキュアWebSocket)ポート
+DEFAULT_SECURE_PORT = 443
+
+# 接続確立を待つ上限秒数（到達不能・TLS不一致時に無限待機しないため）
+CONNECT_TIMEOUT_SECONDS = 15
+
+
+class ConnectionTimeoutError(Exception):
+    """接続確立が制限時間内に完了しなかったことを示す例外"""
+    pass
+
+
+def build_ws_url(host: str, port: Optional[int], secure: bool) -> str:
+    """接続先 WebSocket URL を組み立てる（副作用なし）。
+
+    - secure=True: ``wss://{host}:{port or 443}/ws``
+    - secure=False: ``ws://{host}:{port}/ws``（従来どおり）
+    """
+    scheme = "wss" if secure else "ws"
+    if secure and port is None:
+        port = DEFAULT_SECURE_PORT
+    return "%s://%s:%d/ws" % (scheme, host, port)
+
+
+def build_sslopt(secure: bool, verify_ssl: bool) -> Optional[dict]:
+    """run_forever に渡す sslopt を組み立てる（副作用なし）。
+
+    セキュア接続で証明書検証を無効化する場合のみ ``{"cert_reqs": ssl.CERT_NONE}``。
+    それ以外（非セキュア / 既定検証）は None（websocket-client の既定挙動に委ねる）。
+    """
+    if secure and not verify_ssl:
+        return {"cert_reqs": ssl.CERT_NONE}
+    return None
 
 def str_to_bool(s):
     """
@@ -44,10 +80,11 @@ class _WebSocketClient:
         self.response_event = threading.Event()
         self.callbacks = {}
 
-    def connect(self, host: str, port: int):
+    def connect(self, host: str, port: Optional[int] = None,
+                secure: bool = False, verify_ssl: bool = True):
         self.host = host
         self.port = port
-        self.url = "ws://%s:%d/ws" % (host, port)
+        self.url = build_ws_url(host, port, secure)
         logging.debug("connecting '%s'" % (self.url))
         self.connected = False
         self.ws = websocket.WebSocketApp(self.url,
@@ -55,7 +92,10 @@ class _WebSocketClient:
                                        on_error=self._on_error,
                                        on_close=self._on_close)
         self.ws.on_open = self._on_open
-        self.thread = threading.Thread(target=self.ws.run_forever)
+        # セキュア接続で証明書検証を無効化する場合のみ sslopt を渡す（None なら既定挙動）
+        run_forever = functools.partial(self.ws.run_forever,
+                                        sslopt=build_sslopt(secure, verify_ssl))
+        self.thread = threading.Thread(target=run_forever)
         self.thread.daemon = True
         self._run_forever()
 
@@ -118,8 +158,16 @@ class _WebSocketClient:
     def _run_forever(self):
         self.thread.start()
 
-    def _wait_for_connection(self):
+    def _wait_for_connection(self, timeout: float = CONNECT_TIMEOUT_SECONDS):
+        # 一定時間内に接続が確立しない場合は例外を送出し、無限待機を避ける
+        deadline = time.monotonic() + timeout
         while not self.connected:
+            if time.monotonic() >= deadline:
+                raise ConnectionTimeoutError(
+                    "接続を確立できませんでした（%s に %d 秒以内に接続できませんでした）。"
+                    "ホスト/ポート、secure 指定、TLS証明書の検証設定を確認してください。"
+                    % (getattr(self, "url", "?"), int(timeout))
+                )
             time.sleep(0.1)
 
 
@@ -448,9 +496,18 @@ class Player:
     def __init__(self, player: str):
         self.name = player
 
-    def login(self, host: str, port: int) -> 'Player':
+    def login(self, host: str, port: Optional[int] = None, *,
+              secure: bool = False, verify_ssl: bool = True) -> 'Player':
+        """サーバーにログインする。
+
+        Args:
+            host: サーバーのホスト名 / IP / 公開トンネルのドメイン
+            port: ポート番号。secure=True で省略した場合は標準TLSポート(443)を使用
+            secure: True で wss（TLS暗号化）接続。Colab 等から公開サーバーへ接続する場合に使用
+            verify_ssl: secure=True 時のTLS証明書検証。自己署名/自前トンネル向けに False で無効化可能
+        """
         self.client = _WebSocketClient()
-        self.client.connect(host, port)
+        self.client.connect(host, port, secure=secure, verify_ssl=verify_ssl)
         self.client.send(json.dumps({
             "type": "login",
             "data": {
